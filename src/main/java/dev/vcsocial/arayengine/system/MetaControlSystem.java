@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import dev.vcsocial.arayengine.component.KeyboardInputComponent;
-import dev.vcsocial.arayengine.config.KeyAction;
+import dev.vcsocial.arayengine.config.keybindings.KeyAction;
 import dev.vcsocial.arayengine.core.manager.WindowManager;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;

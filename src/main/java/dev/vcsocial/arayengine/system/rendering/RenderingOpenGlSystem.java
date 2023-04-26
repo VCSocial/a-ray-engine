@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.component.KeyboardInputComponent;
-import dev.vcsocial.arayengine.config.KeyAction;
+import dev.vcsocial.arayengine.config.keybindings.KeyAction;
 import dev.vcsocial.arayengine.core.util.GlOperationsUtil;
 import dev.vcsocial.arayengine.core.util.IoUtils;
 import dev.vcsocial.arayengine.system.EntitySystemOrListener;
@@ -34,7 +34,10 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
      * Pass it to the render system and use that for mesh generation
      */
 
-    int texture = -1;
+    int texture1 = -1;
+    int texture2 = -1;
+
+    private Texture texture;
 
     float[] vertices = {
             // positions          // colors           // texture coords
@@ -48,30 +51,6 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
             0, 1, 3, // first triangle
             1, 2, 3  // second triangle
     };
-
-//    float[] vertices = {
-//            // positions         // colors
-//            0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-//            -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-//            0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
-//    };
-
-
-
-    float[] texCoords = {
-            0.0f, 0.0f,  // lower-left corner
-            1.0f, 0.0f,  // lower-right corner
-            0.5f, 1.0f   // top-center corner
-    };
-
-    float[] borderColor = { 1.0f, 1.0f, 0.0f, 1.0f };
-
-
-//    int[] indices = {  // note that we start from 0!
-//            0, 1, 3,   // first triangle
-//            1, 2, 3    // second triangle
-//    };
-
 
     private Shader shader;
     private boolean init = false;
@@ -153,14 +132,24 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
         GL33.glBindBuffer(GL_ARRAY_BUFFER, 0);
         GL33.glBindVertexArray(0);
 
-        texture = IoUtils.loadTexture("texture_01.png");
+        texture = new Texture("texture_01.png", GL_TEXTURE0);
+        texture2 = IoUtils.loadTexture("awesomeface.png", true);
+
+
+        shader.use();
+        shader.setIntUniform("texture1", 0);
+        shader.setIntUniform("texture2", 1);
     }
 
     private void inRenderLoop() {
 //        GL33.glUseProgram(programId);
-        shader.use();
 //        createUniform();
-        GL33.glBindTexture(GL_TEXTURE_2D, texture);
+
+        texture.activate();
+
+        GL33.glActiveTexture(GL_TEXTURE1);
+        GL33.glBindTexture(GL_TEXTURE_2D, texture2);
+
         GL33.glBindVertexArray(vertexArrayObjectList.get(0));
 //        GL33.glDrawArrays(GL_TRIANGLES, 0, 3);
         GL33.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

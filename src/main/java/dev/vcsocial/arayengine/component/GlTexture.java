@@ -1,4 +1,12 @@
 package dev.vcsocial.arayengine.component;
 
-public record GlTexture(int id, int width, int height) {
+/**
+ * Component meant to represent a texture with its path and whether or not it has alpha
+ *
+ * @since
+ * @author vcsocial
+ */
+public class GlTexture {
+    public String texturePath;
+    public boolean hasAlpha;
 }

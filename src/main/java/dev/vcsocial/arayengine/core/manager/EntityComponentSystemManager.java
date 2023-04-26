@@ -2,7 +2,7 @@ package dev.vcsocial.arayengine.core.manager;
 
 import com.badlogic.ashley.core.*;
 import dev.vcsocial.arayengine.component.*;
-import dev.vcsocial.arayengine.config.KeyAction;
+import dev.vcsocial.arayengine.config.keybindings.KeyAction;
 import dev.vcsocial.arayengine.entity.Player;
 import dev.vcsocial.arayengine.system.EntitySystemOrListener;
 import jakarta.inject.Singleton;

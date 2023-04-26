@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.component.Camera;
-import dev.vcsocial.arayengine.manager.window.WindowLifecycleManager;
 import jakarta.inject.Singleton;
 import org.joml.Vector2d;
 

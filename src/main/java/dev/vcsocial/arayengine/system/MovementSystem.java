@@ -6,7 +6,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import dev.vcsocial.arayengine.component.KeyboardInputComponent;
 import dev.vcsocial.arayengine.component.MovementComponent;
 import dev.vcsocial.arayengine.component.PositionComponent;
-import dev.vcsocial.arayengine.config.KeyAction;
+import dev.vcsocial.arayengine.config.keybindings.KeyAction;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,0 +1,114 @@
+        MutableList<RenderColumnInfo> renderList = Lists.mutable.empty();
+
+        for (int x = 0; x < WindowLifecycleManager.width ; x++) {
+            double cameraX = 2 * x / ((double) WindowLifecycleManager.width) - 1;
+            var rayDirection = new Vector2d(
+                    direction.x + plane.x * cameraX,
+                    direction.y + plane.y * cameraX);
+
+            int mapX = (int) position.x;
+            int mapY = (int) position.y;
+
+            double deltaDistanceX = Math.abs(1.0 / rayDirection.x);
+            double deltaDistanceY = Math.abs(1.0 / rayDirection.y);
+
+            double sideDistX;
+            double sideDistY;
+
+            int stepX;
+            int stepY;
+
+            if (rayDirection.x < 0) {
+                stepX = -1;
+                sideDistX = (position.x - mapX) * deltaDistanceX;
+            } else {
+                stepX = 1;
+                sideDistX = (mapX + 1.0 - position.x) * deltaDistanceX;
+            }
+
+            if (rayDirection.y < 0) {
+                stepY = -1;
+                sideDistY = (position.y - mapY) * deltaDistanceY;
+            } else {
+                stepY = 1;
+                sideDistY = (mapY + 1.0 - position.y) * deltaDistanceY;
+            }
+
+            int hit = 0;
+            int side = 0;
+
+            while (hit == 0) {
+                if (sideDistX < sideDistY) {
+                    sideDistX += deltaDistanceX;
+                    mapX += stepX;
+                    side = 0;
+                } else {
+                    sideDistY += deltaDistanceY;
+                    mapY += stepY;
+                    side = 1;
+                }
+
+                if (TileType.WALL.equals(levelMap.getTileTypeAt(mapX, mapY))) {
+                    hit = 1;
+                }
+            }
+
+            double perpWallDist = side == 0
+                    ? sideDistX - deltaDistanceX
+                    : sideDistY - deltaDistanceY;
+
+            // height of the walls
+            int lineHeight = (int) (WindowLifecycleManager.height / perpWallDist);
+
+            // calc top and bottom of a wall
+            int drawStart = -lineHeight / 2 + WindowLifecycleManager.height / 2;
+            if (drawStart < 0) {
+                drawStart = 0;
+            }
+
+            int drawEnd = lineHeight / 2 + WindowLifecycleManager.height / 2;
+            if (drawStart >= WindowLifecycleManager.height) {
+                drawEnd = WindowLifecycleManager.height - 1;
+            }
+
+            GlColor color = levelMap.getTile(mapX, mapY).getTileColor();
+            if (side == 1) {
+                color = color.shadeBy(0.5f);
+            }
+//            renderVerticalLine(x, drawStart, drawEnd, color);
+            var rec = captureVerticalLine(x, drawStart, drawEnd, color);
+
+            if (!renderList.isEmpty() && renderList.get(renderList.size() - 1).color.equals(rec.color)
+                    && renderList.get(renderList.size() - 1).x < rec.x
+                    && renderList.size() >= 2
+                    && renderList.get(renderList.size() - 2).color.equals(rec.color)) {
+                renderList.remove(renderList.size() - 1);
+            }
+            renderList.add(rec);
+        }
+
+        renderList.forEach(col -> {
+            var str = """
+                    [x=%s]
+                    [r=%s], [g=%s], [b=%s]
+                    [col X=%s] [col Bottom Y=%s] [col Top Y=%s]
+                    """.formatted(col.x, col.color.getRed(), col.color.getGreen(), col.color.getBlue(),
+                    col.x, col.bottomY, col.topY);
+            System.out.println(str);
+        });
+
+        for (int i = 1; i < renderList.size(); i += 2) {
+            var beginColumn = renderList.get(i - 1);
+            var endColumn = renderList.get(i);
+            var c= beginColumn.color;
+
+
+
+            glBegin(GL_QUADS);
+            glColor3f(c.getRed(), c.getGreen(), c.getBlue());
+
+            glVertex2f(beginColumn.x, beginColumn.bottomY);
+            glVertex2f(beginColumn.x, beginColumn.topY);
+            glVertex2f(endColumn.x, endColumn.topY);
+            glVertex2f(endColumn.x, endColumn.bottomY);
+            glEnd();

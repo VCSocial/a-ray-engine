@@ -5,7 +5,7 @@ import java.util.Objects;
 public class GlColor {
 
     private static final float OPAQUE = 1f;
-    private static final float TRANSPARENT = 1f;
+    private static final float TRANSPARENT = 0f;
 
     public static final GlColor RED = new GlColor(255, 0, 0);
     public static final GlColor GREEN = new GlColor(0, 255, 0);

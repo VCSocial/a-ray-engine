@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.component.KeyboardInputComponent;
-import dev.vcsocial.arayengine.config.KeyAction;
+import dev.vcsocial.arayengine.config.keybindings.KeyAction;
 import dev.vcsocial.arayengine.core.manager.ShaderTextured;
 import dev.vcsocial.arayengine.core.util.GlOperationsUtil;
 import jakarta.inject.Singleton;
@@ -147,7 +147,7 @@ public class RenderingSystem extends IteratingSystem implements EntitySystemOrLi
     }
 
     private void renderMesh(GlModel mesh) {
-        mesh.setTexture("PNG/Dark/texture_01.png");
+        mesh.setTexture("textures/Dark/texture_01.png");
         var shader = new ShaderTextured();
 
         shader.start();

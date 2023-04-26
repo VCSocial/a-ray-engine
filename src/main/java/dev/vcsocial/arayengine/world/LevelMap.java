@@ -3,7 +3,6 @@ package dev.vcsocial.arayengine.world;
 import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.common.Renderable;
 import dev.vcsocial.arayengine.component.TileType;
-import dev.vcsocial.arayengine.manager.window.WindowLifecycleManager;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.ImmutableList;
