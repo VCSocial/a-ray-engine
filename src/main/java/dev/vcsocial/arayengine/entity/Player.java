@@ -27,7 +27,7 @@ public class Player implements Renderable, Controllable, Entity {
 
     private Vector2d position;
     private Vector2d direction;
-    private Vector2d plane;
+    private Vector2d cameraPlan;
 
     private float coordinateX;
     private float coordinateY;
@@ -47,7 +47,7 @@ public class Player implements Renderable, Controllable, Entity {
 
         position = new Vector2d(coordinateX, coordinateY);
         direction = new Vector2d(-1, 0);
-        plane = new Vector2d(0, 0.66);
+        cameraPlan = new Vector2d(0, 0.66);
     }
 
     public float getCoordinateX() {
@@ -122,12 +122,12 @@ public class Player implements Renderable, Controllable, Entity {
         this.direction = direction;
     }
 
-    public Vector2d getPlane() {
-        return plane;
+    public Vector2d getCameraPlan() {
+        return cameraPlan;
     }
 
-    public void setPlane(Vector2d plane) {
-        this.plane = plane;
+    public void setCameraPlan(Vector2d cameraPlan) {
+        this.cameraPlan = cameraPlan;
     }
 
     public void updateX() {

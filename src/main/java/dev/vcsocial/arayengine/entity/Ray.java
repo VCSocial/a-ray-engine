@@ -19,7 +19,13 @@ public class Ray implements Renderable {
     private static final double THREE_PI_TWO = 3 * Math.PI / 2;
     private static final float DEGREE_IN_RADIANS = 0.0174533f;
 
+    /*
+    [ cos(a) -sin(a) ]
+    [ sin(a)  cos(a) ]
+     */
+
     private final Entity eminator;
+    private Vector2f rayDirection;
     private RayType rayType;
     private float rayAngle;
     private final LevelMap levelMap;
