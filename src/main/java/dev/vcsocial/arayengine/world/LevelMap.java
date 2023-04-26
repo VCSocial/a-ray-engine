@@ -1,19 +1,15 @@
 package dev.vcsocial.arayengine.world;
 
 import dev.vcsocial.arayengine.common.GlColor;
-import dev.vcsocial.arayengine.common.Renderable;
 import dev.vcsocial.arayengine.component.TileType;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
-import org.joml.Vector2d;
 import org.joml.Vector2i;
 
-import static org.lwjgl.opengl.GL33.*;
-
-public class LevelMap implements Renderable {
+public class LevelMap {
 
     private static final ImmutableList<Tile> DEFAULT_TILE_MAP = Lists.immutable.of(
             Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.GREEN), Tile.wall(GlColor.GREEN),
@@ -124,26 +120,26 @@ public class LevelMap implements Renderable {
         return null;
     }
 
-    public void render() {
-        if (toggleRenderEnabled) {
-            var playerPosition = new Vector2d();
-
-
-            // Identify middle of the screen and identify point half way offset using height and width
-            var xA = (WindowLifecycleManager.width/ Tile.getTileSize() / 2) - (width / 2);
-            var yA = (WindowLifecycleManager.height / Tile.getTileSize() / 2) - (height / 2);
-
-            // Draw each grid item
-            for (int i = 0 ; i < tileMap.size(); i++) {
-
-                // Extract x and y coordinates
-                int x = i % width;
-                int y = i / height;
-
-                // Begin drawing at offset
-                int xo = (x + xA) * Tile.getTileSize();
-                int yo = (y + yA) * Tile.getTileSize();
-
+//    public void render() {
+//        if (toggleRenderEnabled) {
+//            var playerPosition = new Vector2d();
+//
+//
+//            // Identify middle of the screen and identify point half way offset using height and width
+//            var xA = (WindowLifecycleManager.width/ Tile.getTileSize() / 2) - (width / 2);
+//            var yA = (WindowLifecycleManager.height / Tile.getTileSize() / 2) - (height / 2);
+//
+//            // Draw each grid item
+//            for (int i = 0 ; i < tileMap.size(); i++) {
+//
+//                // Extract x and y coordinates
+//                int x = i % width;
+//                int y = i / height;
+//
+//                // Begin drawing at offset
+//                int xo = (x + xA) * Tile.getTileSize();
+//                int yo = (y + yA) * Tile.getTileSize();
+//
 //                glBegin(GL_QUADS);
 //                glColor4f(0.25f,0.25f,0.25f, 1f);
 //                glVertex2i(0, 0);
@@ -152,41 +148,41 @@ public class LevelMap implements Renderable {
 //                glVertex2i(width, 0);
 //                glEnd();
 
-                glBegin(GL_QUADS);
-
-                // Draw grid item outline
-                var color = getTile(x, y).getTileColor();
-                if (!TileType.WALL.equals(getTile(x, y).getTileType())) {
-                    color = GlColor.BLACK;
-                }
-
-                glColor3f(color.getRed(),color.getGreen(),color.getBlue());
-                glVertex2i(xo, yo);
-                glVertex2i(xo, yo + Tile.getTileSize());
-                glVertex2i(xo + Tile.getTileSize(), yo + Tile.getTileSize());
-                glVertex2i(xo + Tile.getTileSize(), yo);
-
-                // Draw grid item
-                if (TileType.WALL.equals(getTile(x, y).getTileType())) {
-                    color = color.shadeBy(0.9f);
-                } else {
-                    color = GlColor.WHITE;
-                }
-
-                glColor3f(color.getRed(),color.getGreen(),color.getBlue());
-                glVertex2i(xo + 1, yo + 1);
-                glVertex2i(xo + 1, yo + Tile.getTileSize() - 1);
-                glVertex2i(xo + Tile.getTileSize() - 1, yo + Tile.getTileSize() - 1);
-                glVertex2i(xo - 1 + Tile.getTileSize(), yo + 1);
-                glEnd();
-
-                double playerX = (playerPosition.x + xA) * Tile.getTileSize();
-                double playerY = (playerPosition.y + yA) * Tile.getTileSize();
-                glColor3f(0, 1, 0);
-                glPointSize(16);
-                glBegin(GL_POINTS);
-                glVertex2d(playerX, playerY);
-                glEnd();
+//                glBegin(GL_QUADS);
+//
+//                // Draw grid item outline
+//                var color = getTile(x, y).getTileColor();
+//                if (!TileType.WALL.equals(getTile(x, y).getTileType())) {
+//                    color = GlColor.BLACK;
+//                }
+//
+//                glColor3f(color.getRed(),color.getGreen(),color.getBlue());
+//                glVertex2i(xo, yo);
+//                glVertex2i(xo, yo + Tile.getTileSize());
+//                glVertex2i(xo + Tile.getTileSize(), yo + Tile.getTileSize());
+//                glVertex2i(xo + Tile.getTileSize(), yo);
+//
+//                // Draw grid item
+//                if (TileType.WALL.equals(getTile(x, y).getTileType())) {
+//                    color = color.shadeBy(0.9f);
+//                } else {
+//                    color = GlColor.WHITE;
+//                }
+//
+//                glColor3f(color.getRed(),color.getGreen(),color.getBlue());
+//                glVertex2i(xo + 1, yo + 1);
+//                glVertex2i(xo + 1, yo + Tile.getTileSize() - 1);
+//                glVertex2i(xo + Tile.getTileSize() - 1, yo + Tile.getTileSize() - 1);
+//                glVertex2i(xo - 1 + Tile.getTileSize(), yo + 1);
+//                glEnd();
+//
+//                double playerX = (playerPosition.x + xA) * Tile.getTileSize();
+//                double playerY = (playerPosition.y + yA) * Tile.getTileSize();
+//                glColor3f(0, 1, 0);
+//                glPointSize(16);
+//                glBegin(GL_POINTS);
+//                glVertex2d(playerX, playerY);
+//                glEnd();
 
                 // TODO convert to flat top down view
 //                double directionX = (playerDirection.x + xA) * Tile.getTileSize();
@@ -197,12 +193,12 @@ public class LevelMap implements Renderable {
 //                glVertex2d(playerX + directionX, playerY + directionY);
 //                glEnd();
             }
-        }
-    }
+//        }
 
-    public static LevelMap getFixedClosedMap(int width, int height) {
-        return new LevelMap(width, height);
-    }
+//
+//    public static LevelMap getFixedClosedMap(int width, int height) {
+//        return new LevelMap(width, height);
+//    }
 
 //        var map = new Tile[width][height];
 //
@@ -248,4 +244,4 @@ public class LevelMap implements Renderable {
     // 1 1 1 1 0 0 0 0 0 0 0  0
 
     // x >= (width * height) - width, 8 >= (4 * 3) - 3, 8 >= 12 - 3, 8 >= 8
-}
+

@@ -19,6 +19,7 @@ public class MouseBindingsConfiguration {
                 PrimitiveTuples.pair(-1, 0), CursorAction.LEFT,
                 PrimitiveTuples.pair(-1, 0), CursorAction.RIGHT
         );
+        cursorMappings.put(PrimitiveTuples.pair(0, 0), CursorAction.STILL);
 
         mouseMappings = UnifiedMap.newWithKeysValues(
                 PrimitiveTuples.pair(GLFW.GLFW_MOUSE_BUTTON_1, GLFW.GLFW_PRESS), MouseAction.FIRE,
@@ -84,5 +85,9 @@ public class MouseBindingsConfiguration {
             cursorMappings.remove(currentRightMapping);
             cursorMappings.put(newMapping, CursorAction.RIGHT);
         }
+    }
+
+    public CursorAction getActionForCursorDelta(int deltaX, int deltaY) {
+        return cursorMappings.get(PrimitiveTuples.pair(deltaX, deltaY));
     }
 }

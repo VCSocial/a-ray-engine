@@ -10,8 +10,11 @@ import dev.vcsocial.arayengine.core.util.GlOperationsUtil;
 import dev.vcsocial.arayengine.core.util.IoUtils;
 import dev.vcsocial.arayengine.system.EntitySystemOrListener;
 import jakarta.inject.Singleton;
+import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
+import org.eclipse.collections.api.tuple.Triple;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL33;
@@ -19,6 +22,7 @@ import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Map;
 
 import static org.joml.Math.sin;
 import static org.lwjgl.opengl.GL33.*;
@@ -66,6 +70,41 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
         vertexArrayObjectList = IntLists.mutable.empty();
         vertexBufferObjectList = IntLists.mutable.empty();
         elementBufferObjectList = IntLists.mutable.empty();
+    }
+
+    public int[] generateIndiciesFromVertices(float[] vertices, int width) {
+        int stride = 3;
+
+        int numberVertices = (vertices.length / width) * stride; // TODO expect 6 for hard coded test
+        Map<Triple, Integer> positions = Maps.mutable.ofInitialCapacity(numberVertices);
+
+        // TODO we can find the triples right but not the resulting indices
+        for (int i = 0; i < vertices.length; i += width) {
+            float x = Float.MIN_VALUE;
+            float y = Float.MIN_VALUE;
+            float z = Float.MIN_VALUE;
+            for (int j = i; j < i + stride; j++) {
+                if (i + stride - j == 3) {
+                    x = vertices[j];
+                } else if (i + stride - j == 2) {
+                    y = vertices[j];
+                } else if (i + stride - j == 1) {
+                    z = vertices[j];
+                }
+            }
+
+            positions.put(Tuples.triple(x, y, z), i % width);
+        }
+
+
+
+//        var val = positions.values();
+//        int[] indicesGen = new int[val.size()];
+//        for (int i = 0; i < val.size(); i++) {
+//            indicesGen[i] = val.
+//        }
+
+        return new int[] {};
     }
 
     private FloatBuffer toFloatBuffer(float[] data) {
@@ -132,8 +171,8 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
         GL33.glBindBuffer(GL_ARRAY_BUFFER, 0);
         GL33.glBindVertexArray(0);
 
-        texture = new Texture("texture_01.png", GL_TEXTURE0);
-        texture2 = IoUtils.loadTexture("awesomeface.png", true);
+        texture = new Texture("Dark/texture_01.png", GL_TEXTURE0);
+        texture2 = IoUtils.loadTexture("Dark/awesomeface.png", true);
 
 
         shader.use();
@@ -199,6 +238,7 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
             renderInitialization();
             System.out.println("Should only be one");
             init = true;
+            generateIndiciesFromVertices(vertices, 8);
         }
         inRenderLoop();
     }
