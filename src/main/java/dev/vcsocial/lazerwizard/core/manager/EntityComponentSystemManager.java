@@ -44,7 +44,7 @@ public class EntityComponentSystemManager {
                 .withCursorInput(new CursorInputComponent())
                 .withMouseButtonInput(new MouseButtonInputComponent())
                 .withKeyboardInput(new KeyboardInputComponent())
-                .withPosition(new PositionComponent(1,1))
+                .withPosition(new PositionComponent(2,2))
                 .withMovement(new MovementComponent(new Vector2f(0, 0), 0.03f))
                 .withLineMeshGroup(new LineMeshGroup())
                 .build();

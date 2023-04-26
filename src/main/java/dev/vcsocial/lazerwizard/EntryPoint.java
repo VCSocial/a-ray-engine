@@ -12,6 +12,9 @@ import io.avaje.inject.BeanScope;
 public class EntryPoint {
 
     public static void main(String[] args) {
+        // TODO what is an appropriate size? The default is 64KiBi this sets it to 1MiBi
+        System.setProperty("org.lwjgl.system.stackSize", "1024");
+
         BeanScope.newBuilder().build()
                 .get(EngineLifeCycleManager.class)
                 .executeGameLoop();

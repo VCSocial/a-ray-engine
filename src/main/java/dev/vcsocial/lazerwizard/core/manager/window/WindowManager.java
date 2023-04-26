@@ -29,9 +29,9 @@ public class WindowManager implements AutoCloseable {
 
     private static final Logger LOGGER = LogManager.getLogger(WindowManager.class);
     private static final String DEFAULT_TITLE = "Lazer Wizard Engine";
-    private static final int DEFAULT_WIDTH = 1024;
-    private static final int DEFAULT_HEIGHT = 576;
-    private static final GlColor DEFAULT_BACKGROUND_COLOR = new GlColor(125, 50, 150);
+    private static final int DEFAULT_WIDTH = 1920;
+    private static final int DEFAULT_HEIGHT = 1080;
+    private static final GlColor DEFAULT_BACKGROUND_COLOR = new GlColor(125, 50, 175);
 
     private final FrameManager frameManager;
     private final LifeCycleEventBroker lifeCycleEventBroker;
@@ -40,12 +40,25 @@ public class WindowManager implements AutoCloseable {
     private int height;
     public long window;
 
-    public WindowManager(FrameManager frameManager, LifeCycleEventBroker lifeCycleEventBroker) { // List<PollingManager> inputPollerList) {
+    public WindowManager(FrameManager frameManager, LifeCycleEventBroker lifeCycleEventBroker) {
         this.frameManager = frameManager;
         this.lifeCycleEventBroker = lifeCycleEventBroker;
         title = DEFAULT_TITLE;
         width = DEFAULT_WIDTH;
         height = DEFAULT_HEIGHT;
+    }
+
+    private void initializeGl() {
+        GL.createCapabilities();
+        LOGGER.debug("OpenGL capabilities have been created");
+
+        GlOperationsUtil.glClearColor(DEFAULT_BACKGROUND_COLOR);
+        GL33.glEnable(GL33.GL_DEPTH_TEST | GL33.GL_STENCIL_TEST);
+
+        // Set back to be culled based on counterclockwise indexing
+        GL33.glEnable(GL33.GL_CULL_FACE);
+        GL33.glCullFace(GL33.GL_BACK);
+        GL33.glFrontFace(GL33.GL_CCW);
     }
 
     public boolean shouldWindowClose() {
@@ -71,7 +84,7 @@ public class WindowManager implements AutoCloseable {
         if (!GLFW.glfwInit()) {
             throw new GlfwInitializationException("Unable to initialize Glfw");
         }
-        LOGGER.trace("Successfully initialized GLFW");
+        LOGGER.debug("Successfully initialized GLFW");
 
         GLFW.glfwDefaultWindowHints();
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GL33.GL_FALSE);
@@ -82,13 +95,16 @@ public class WindowManager implements AutoCloseable {
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
 
+        // Get primary monitor
+        long primaryMonitor = glfwGetPrimaryMonitor();
+
         // Create window
-//        window = GLFW.glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), MemoryUtil.NULL);
-        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
+        window = GLFW.glfwCreateWindow(width, height, title, primaryMonitor, MemoryUtil.NULL);
+//        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if (window == MemoryUtil.NULL) {
             throw new GlfwWindowCreationException("Unable to create window through GLFW");
         }
-        LOGGER.trace("Successfully created the window");
+        LOGGER.debug("Successfully created the window");
 
         GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
             this.width = width;
@@ -97,44 +113,36 @@ public class WindowManager implements AutoCloseable {
         });
 
         // Hide the cursor when it enters the screen
-        GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+//        GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
         // Get the thread stack and push a new frame
+        // the stack frame is popped automatically
         try (MemoryStack stack = stackPush()) {
-            IntBuffer pWidth = stack.mallocInt(1); // int*
-            IntBuffer pHeight = stack.mallocInt(1); // int*
+            IntBuffer ptrToWidth = stack.mallocInt(1);
+            IntBuffer ptrToHeight = stack.mallocInt(1);
 
             // Get the window size passed to glfwCreateWindow
-            GLFW.glfwGetWindowSize(window, pWidth, pHeight);
+            GLFW.glfwGetWindowSize(window, ptrToWidth, ptrToHeight);
 
             // Get the resolution of the primary monitor
-            GLFWVidMode videoMode = GLFW.glfwGetVideoMode(glfwGetPrimaryMonitor());
+            GLFWVidMode videoMode = GLFW.glfwGetVideoMode(primaryMonitor);
 
             // Center the window
             GLFW.glfwSetWindowPos(
                     window,
-                    (videoMode.width() - pWidth.get(0)) / 2,
-                    (videoMode.height() - pHeight.get(0)) / 2
+                    (videoMode.width() - ptrToWidth.get(0)) / 2,
+                    (videoMode.height() - ptrToHeight.get(0)) / 2
             );
-        } // the stack frame is popped automatically
+        }
 
         // Set vsync to on and display the window
         GLFW.glfwMakeContextCurrent(window);
         GLFW.glfwSwapInterval(1);
         GLFW.glfwShowWindow(window);
 
-        GL.createCapabilities();
-        LOGGER.trace("OpenGL capabilities have been created");
-
-        GlOperationsUtil.glClearColor(DEFAULT_BACKGROUND_COLOR);
-        GL33.glEnable(GL33.GL_DEPTH_TEST | GL33.GL_STENCIL_TEST);
-
-        // Set back to be culled based on counterclockwise indexing
-        GL33.glEnable(GL33.GL_CULL_FACE);
-        GL33.glCullFace(GL33.GL_BACK);
-        GL33.glFrontFace(GL33.GL_CCW);
-
+        initializeGl();
         lifeCycleEventBroker.registerEvent(new PostWindowInitializationEvent());
     }
 
@@ -146,10 +154,10 @@ public class WindowManager implements AutoCloseable {
     public void update() {
         GLFW.glfwSetWindowTitle(window,
                 title + " \t | \t [Frame Time ms=" + frameManager.getFrameTimeMs() + "]");
-
     }
 
     public void setWindowShouldClose() {
         GLFW.glfwSetWindowShouldClose(window, true);
+        LOGGER.debug("Set window to should close, attempting to quit!");
     }
 }

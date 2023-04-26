@@ -9,7 +9,6 @@ import dev.vcsocial.lazerwizard.core.manager.window.WindowManager;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
 
 @Singleton
 public class MetaControlSystem extends IteratingSystem implements EntitySystemOrListener {
@@ -24,8 +23,7 @@ public class MetaControlSystem extends IteratingSystem implements EntitySystemOr
     }
 
     private void quit() {
-        LOGGER.debug("Found quit input, attempting to quit!");
-        GLFW.glfwSetWindowShouldClose(windowManager.getWindow(), true);
+        windowManager.setWindowShouldClose();
     }
 
     @Override
