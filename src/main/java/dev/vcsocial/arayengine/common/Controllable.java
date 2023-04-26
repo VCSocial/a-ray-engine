@@ -40,10 +40,10 @@ public interface Controllable {
                     moveBackward();
                 }
                 if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-                    rotateLeft();
+                    moveLeft();
                 }
                 if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-                    rotateRight();
+                    moveRight();
                 }
             }
         });
@@ -52,6 +52,10 @@ public interface Controllable {
     void moveForward();
 
     void moveBackward();
+
+    void moveLeft();
+
+    void moveRight();
 
     void rotateLeft();
 

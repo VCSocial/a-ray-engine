@@ -5,48 +5,62 @@ import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.common.Renderable;
 import dev.vcsocial.arayengine.window.Window;
 import org.eclipse.collections.api.factory.Lists;
-import org.eclipse.collections.api.list.FixedSizeList;
+import org.eclipse.collections.api.factory.Maps;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.map.MutableMap;
+import org.joml.Vector2i;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class LevelMap implements Renderable {
 
-    private static final FixedSizeList<Tile> DEFAULT_TILE_MAP = Lists.fixedSize.of(
-            Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.floor(), Tile.wallColored(GlColor.BLUE), Tile.floor(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wallColored(GlColor.GREEN),
-            Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall()
+    private static final ImmutableList<Tile> DEFAULT_TILE_MAP = Lists.immutable.of(
+            Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.GREEN), Tile.wall(GlColor.GREEN),
+            Tile.wall(GlColor.YELLOW), Tile.floor(), Tile.floor(), Tile.wall(GlColor.BLUE), Tile.floor(), Tile.wall(GlColor.GREEN),
+            Tile.wall(GlColor.YELLOW), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(GlColor.GREEN),
+            Tile.wall(GlColor.YELLOW), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(GlColor.GREEN),
+            Tile.wall(GlColor.YELLOW), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(),
+            Tile.wall(GlColor.YELLOW), Tile.wall(GlColor.YELLOW), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall()
     );
 
     private final int width;
     private final int height;
-    private final FixedSizeList<Tile> tileMap;
+    private final ImmutableList<Tile> tileMap;
+    private final MutableMap<Tile, MutableList<Vector2i>> tileMutableListMutableMap;
     private boolean toggleRenderEnabled = false;
 
     public LevelMap(int width, int height) {
         this(width, height, generateTileList(width, height));
     }
 
-    public LevelMap(int width, int height, FixedSizeList<Tile> tileMap) {
+    public LevelMap(int width, int height, ImmutableList<Tile> tileMap) {
         this.width = width;
         this.height = height;
         this.tileMap = tileMap;
+        this.tileMutableListMutableMap = convertToTypeMap();
     }
 
+    private MutableMap<Tile, MutableList<Vector2i>> convertToTypeMap() {
+        MutableMap<Tile, MutableList<Vector2i>> tileTypePosition = Maps.mutable.empty();
 
-    public static LevelMap getDefaultLevelMap() {
-        return new LevelMap(6,6, DEFAULT_TILE_MAP);
-    }
+        for (int x = 0; x < width ; x++) {
+            for (int y = 0; y < height; y++) {
+                var tile = getTile(x, y);
 
-    public void toggleRendering() {
-        toggleRenderEnabled = !toggleRenderEnabled;
+                if (tileTypePosition.contains(tile)) {
+                    var list = tileTypePosition.get(tile);
+                    list.add(new Vector2i(x, y));
+                } else {
+                    tileTypePosition.put(tile, Lists.mutable.of(new Vector2i(x, y)));
+                }
+            }
+        }
+        return tileTypePosition;
     }
 
     // TODO Buggy
-    private static FixedSizeList<Tile> generateTileList(int width, int height) {
+    private static ImmutableList<Tile> generateTileList(int width, int height) {
         MutableList<Tile> mapper = Lists.mutable.empty();
         for (int x = 0; x < (width * height); x++) {
             System.out.println("Indexing [x=" + x + "]");
@@ -59,8 +73,19 @@ public class LevelMap implements Renderable {
                 mapper.add(Tile.floor());
             }
         }
-        return Lists.fixedSize.ofAll(mapper);
+        return Lists.immutable.ofAll(mapper);
     }
+
+    public static LevelMap getDefaultLevelMap() {
+        return new LevelMap(6,6, DEFAULT_TILE_MAP);
+    }
+
+
+
+    public void toggleRendering() {
+        toggleRenderEnabled = !toggleRenderEnabled;
+    }
+
 
     public Tile getTile(int i) {
         return tileMap.get(i);
@@ -69,7 +94,7 @@ public class LevelMap implements Renderable {
     // TODO remove null
     public Tile getTile(int x, int y) {
         var i = width * y + x;
-        if (i >= tileMap.size() || i < 0) {
+        if (i >= tileMap.size() || i < 0 || x >= width || y >= height) {
             return null;
         }
         return getTile(i);
@@ -131,11 +156,12 @@ public class LevelMap implements Renderable {
                 glBegin(GL_QUADS);
 
                 // Draw grid item outline
+                var color = getTile(x, y).getTileColor();
                 if (!TileType.WALL.equals(getTile(x, y).getTileType())) {
-                    glColor3f(1,1,1);
-                } else {
-                    glColor3f(0,0,0);
+                    color = GlColor.BLACK;
                 }
+
+                glColor3f(color.getRed(),color.getGreen(),color.getBlue());
                 glVertex2i(xo, yo);
                 glVertex2i(xo, yo + Tile.getTileSize());
                 glVertex2i(xo + Tile.getTileSize(), yo + Tile.getTileSize());
@@ -143,10 +169,12 @@ public class LevelMap implements Renderable {
 
                 // Draw grid item
                 if (TileType.WALL.equals(getTile(x, y).getTileType())) {
-                    glColor3f(1,1,1);
+                    color = color.shadeBy(0.9f);
                 } else {
-                    glColor3f(0,0,0);
+                    color = GlColor.WHITE;
                 }
+
+                glColor3f(color.getRed(),color.getGreen(),color.getBlue());
                 glVertex2i(xo + 1, yo + 1);
                 glVertex2i(xo + 1, yo + Tile.getTileSize() - 1);
                 glVertex2i(xo + Tile.getTileSize() - 1, yo + Tile.getTileSize() - 1);

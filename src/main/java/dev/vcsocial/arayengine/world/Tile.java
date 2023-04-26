@@ -3,12 +3,14 @@ package dev.vcsocial.arayengine.world;
 import dev.vcsocial.arayengine.common.GlColor;
 
 public class Tile {
-    private static final int tileSize = 64;
+    private static final GlColor DEFAULT_COLOR = GlColor.RED;
+    private static final int TILE_SIZE = 64;
+
     private final TileType tileType;
     private final GlColor tileColor;
 
     private Tile(TileType tileType) {
-        this(tileType, new GlColor(255, 0 ,0));
+        this(tileType, DEFAULT_COLOR);
     }
 
     private Tile(TileType tileType, GlColor color) {
@@ -17,7 +19,7 @@ public class Tile {
     }
 
     public static int getTileSize() {
-        return tileSize;
+        return TILE_SIZE;
     }
 
     public TileType getTileType() {
@@ -29,10 +31,10 @@ public class Tile {
     }
 
     public static Tile wall() {
-        return new Tile(TileType.WALL);
+        return new Tile(TileType.WALL, GlColor.RED);
     }
 
-    public static Tile wallColored(GlColor c) {
+    public static Tile wall(GlColor c) {
         return new Tile(TileType.WALL, c);
     }
 

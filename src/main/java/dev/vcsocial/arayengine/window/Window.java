@@ -2,7 +2,6 @@ package dev.vcsocial.arayengine.window;
 
 import dev.vcsocial.arayengine.diagnostics.FpsCounter;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -65,7 +64,8 @@ public class Window {
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+//        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         windowConsumers
@@ -129,8 +129,6 @@ public class Window {
     }
 
     public void run() {
-        System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
         init();
         loop();
 
