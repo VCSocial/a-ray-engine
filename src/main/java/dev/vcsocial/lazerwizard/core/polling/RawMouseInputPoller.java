@@ -43,14 +43,14 @@ public class RawMouseInputPoller implements RawPoller {
     public void initialize() {
         while (!lifeCycleEventBroker.containsEvent(PostWindowInitializationEvent.class)) {
             // TODO something better than a busy loop, maybe completable future could be used here
-            LOGGER.trace("Waiting on window initialization before registering keyboard callbacks");
+            LOGGER.debug("Waiting on window initialization before registering keyboard callbacks");
         }
         lifeCycleEventBroker.acknowledgeEvent(this.getClass(), PostWindowInitializationEvent.class);
         long window = windowManager.getWindow();
 
         GLFW.glfwSetCursorEnterCallback(window, (w, entered) -> {
             isCursorWithinWindow = entered;
-            LOGGER.trace("[isCursorWithinWindow={}]", isCursorWithinWindow);
+            LOGGER.debug("[isCursorWithinWindow={}]", isCursorWithinWindow);
         });
 
         GLFW.glfwSetCursorPosCallback(window, (w, positionX, positionY) -> {

@@ -29,8 +29,8 @@ public class WindowManager implements AutoCloseable {
 
     private static final Logger LOGGER = LogManager.getLogger(WindowManager.class);
     private static final String DEFAULT_TITLE = "Lazer Wizard Engine";
-    private static final int DEFAULT_WIDTH = 1920;
-    private static final int DEFAULT_HEIGHT = 1080;
+    private static final int DEFAULT_WIDTH = 1024;
+    private static final int DEFAULT_HEIGHT = 576;
     private static final GlColor DEFAULT_BACKGROUND_COLOR = new GlColor(125, 50, 175);
 
     private final FrameManager frameManager;
@@ -99,7 +99,7 @@ public class WindowManager implements AutoCloseable {
         long primaryMonitor = glfwGetPrimaryMonitor();
 
         // Create window
-        window = GLFW.glfwCreateWindow(width, height, title, primaryMonitor, MemoryUtil.NULL);
+        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
 //        window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if (window == MemoryUtil.NULL) {
             throw new GlfwWindowCreationException("Unable to create window through GLFW");

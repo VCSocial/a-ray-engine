@@ -133,8 +133,21 @@ public class RayCastingSystem extends IteratingSystem implements EntitySystemOrL
             if (side == 1) {
                 color = new GlColor(color.r / 2, color.g / 2, color.b / 2, color.alpha);
             }
-            // lineMeshList.add(new LineMesh(x, toNdc(0f, false), drawStart, GlColor.BLACK)); //  TODO Giant black line in middle of screen :D
-            lineMeshList.add(computeVertical(x, drawStart, drawEnd, color));
+            var lineMeshWall = computeVertical(x, drawStart, drawEnd, color);
+            var lineMeshFloor = computeVertical(x, 0, drawStart, new GlColor(0.25f,0.25f, 0.25f, 1 ));
+            var lineMeshCeiling = computeVertical(x, drawEnd, windowHeight, new GlColor(0.75f, 0.75f, 0.75f, 1));
+
+            if (lineMeshWall != null) {
+                lineMeshList.add(lineMeshWall);
+            }
+            if (lineMeshFloor != null) {
+                lineMeshList.add(lineMeshFloor);
+            }
+            if (lineMeshCeiling != null) {
+                lineMeshList.add(lineMeshCeiling);
+            }
+//            lineMeshList.add(new LineMesh(x, toNdc(0f, false), drawStart, GlColor.BLACK)); //  TODO Giant black line in middle of screen :D
+//            lineMeshList.add(computeVertical());
         }
         return lineMeshList;
     }

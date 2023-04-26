@@ -58,6 +58,25 @@ public class MovementSystem extends IteratingSystem implements EntitySystemOrLis
 //    }
      */
 
+    /**
+     * Rotate along the direction and plane
+     *
+     * @param direction
+     * @param plane
+     * @param speed a positive speed incurs a leftward rotation a negative a rightward
+     * @param deltaTime
+     */
+    private void rotate(Vector2f direction, Vector2f plane, float speed, float deltaTime) {
+        float rotationSpeed = deltaTime * speed;
+        float tempDirectionX = direction.x;
+        direction.x =  direction.x * cos(rotationSpeed) - direction.y * sin(rotationSpeed);
+        direction.y = tempDirectionX * sin(rotationSpeed) + direction.y * cos(rotationSpeed);
+
+        float tempPlaneX = plane.x;
+        plane.x = plane.x * cos(rotationSpeed) - plane.y * sin(rotationSpeed);
+        plane.y = tempPlaneX * sin(rotationSpeed) + plane.y * cos(rotationSpeed);
+    }
+
     private void rotateLeft(Vector2f direction, Vector2f plane, float deltaTime) {
         float speed = 2f;
         float rotSpeed = deltaTime * speed;
@@ -162,12 +181,11 @@ public class MovementSystem extends IteratingSystem implements EntitySystemOrLis
         var position = PositionComponent.COMPONENT_MAPPER.get(entity);
         var cursorInputComponent = CursorInputComponent.COMPONENT_MAPPER.get(entity);
 
+        float speed = 0.2f;
         if (CursorAction.LEFT.equals(cursorInputComponent.cursorAction)) {
-            rotateLeft(direction, plane, movement.velocity);
-            LOGGER.debug("Rotating Left");
+            rotate(direction, plane, speed, deltaTime);
         } else if (CursorAction.RIGHT.equals(cursorInputComponent.cursorAction)) {
-            rotateRight(direction, plane, movement.velocity);
-            LOGGER.debug("Rotating Right");
+            rotate(direction, plane, -speed, deltaTime);
         }
 
         if (KeyActionVertical.FORWARD.equals(keyboardInputComponent.keyActionVertical)) {

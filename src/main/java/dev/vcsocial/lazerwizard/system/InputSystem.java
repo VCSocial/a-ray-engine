@@ -32,7 +32,6 @@ public class InputSystem extends IteratingSystem implements Listener<InputSignal
     private final MouseBindingsConfiguration mouseBindingsConfiguration;
     private final KeyBindingsConfiguration keyBindingsConfiguration;
 
-    private Vector2i latestCursorDelta;
     private Vector2i latestMouseButton;
     private CursorAction latestCursorAction;
     private MouseAction latestMouseAction;
@@ -53,10 +52,9 @@ public class InputSystem extends IteratingSystem implements Listener<InputSignal
     @Override
     public void receive(Signal<InputSignal> signal, InputSignal inputSignal) {
         if (inputSignal instanceof CursorInputSignal c) {
-            latestCursorDelta = new Vector2i(c.deltaX(), c.deltaY());
             latestCursorAction = mouseBindingsConfiguration.getActionForCursorDelta(c.deltaX(), c.deltaY());
-            LOGGER.debug("Set [latestCursorAction={}], [deltaX={}], [deltaY={}]", latestCursorAction,
-                    latestCursorDelta.x, latestCursorDelta.y);
+            LOGGER.trace("Set [latestCursorAction={}], [deltaX={}], [deltaY={}]", latestCursorAction,
+                    c.deltaX(), c.deltaY());
         }
 
         if (inputSignal instanceof MouseButtonInputSignal m) {
