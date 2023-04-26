@@ -32,7 +32,7 @@ public class EntryPoint {
     private static final int WIDTH = 1024;
     private static final int HEIGHT = 576;
     private static final LevelMap levelMap = LevelMap.getDefaultLevelMap();
-    private static final Player player = new Player(275, 275);
+    private static final Player player = new Player(275, 275, levelMap);
     private static final ImmutableUnifiedMap<Tile, GlColorCompatible> colorMapping = new ImmutableUnifiedMap<>(Map.of(
             Tile.wall(), new GlColorCompatible(255, 0, 0),
             Tile.floor(), new GlColorCompatible(0, 255, 0),

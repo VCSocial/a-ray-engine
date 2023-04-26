@@ -5,6 +5,8 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.FixedSizeList;
 import org.eclipse.collections.api.list.MutableList;
 
+import java.awt.Color;
+
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3f;
@@ -12,16 +14,13 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 
 public class LevelMap implements Renderable {
-    public static int globalWidth = 0;
-    public static int globalHeight = 0;
-    public static LevelMap myself;
 
     private static final FixedSizeList<Tile> DEFAULT_TILE_MAP = Lists.fixedSize.of(
             Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(),
             Tile.wall(), Tile.floor(), Tile.wall(), Tile.floor(), Tile.floor(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.wall(), Tile.floor(), Tile.floor(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.wall(), Tile.wall(), Tile.floor(), Tile.wall(),
             Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(),
+            Tile.wall(), Tile.floor(), Tile.floor(), Tile.wallColored(Color.BLUE), Tile.floor(), Tile.wall(),
+            Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wallColored(Color.GREEN),
             Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall()
     );
 
@@ -38,10 +37,6 @@ public class LevelMap implements Renderable {
         this.width = width;
         this.height = height;
         this.tileMap = tileMap;
-
-        globalWidth = width;
-        globalHeight = height;
-        myself = this;
     }
 
 
@@ -70,8 +65,38 @@ public class LevelMap implements Renderable {
         return tileMap.get(i);
     }
 
+    // TODO remove null
     public Tile getTile(int x, int y) {
-        return tileMap.get(width * y + x);
+        var i = width * y + x;
+        if (i >= tileMap.size() || i < 0) {
+            return null;
+        }
+        return getTile(i);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    // TODO remove null
+    public TileType getTileTypeAt(int x, int y) {
+        var tile = getTile(x, y);
+        if (tile != null) {
+            return tile.getTileType();
+        }
+        return null;
+    }
+
+    public TileType getTileTypeAt(int i) {
+        var tile = getTile(i);
+        if (tile != null) {
+            return tile.getTileType();
+        }
+        return null;
     }
 
     public void render() {
