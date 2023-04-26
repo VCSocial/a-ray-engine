@@ -19,12 +19,18 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window {
 
     private static final String DEFAULT_TITLE = "A Ray Engine";
-    private static final int DEFAULT_WIDTH = 1024;
-    private static final int DEFAULT_HEIGHT = 576;
+    private static final int DEFAULT_WIDTH = 1920;
+    private static final int DEFAULT_HEIGHT = 1080;
 
-    private final int width;
-    private final int height;
-    private final String title;
+    public static double time = org.lwjgl.glfw.GLFW.glfwGetTime();
+    public static double oldTime = time;
+    public static double frameTime = 0;
+
+    // TODO Encapsulate?
+    public static int width = DEFAULT_WIDTH;
+    public static int height = DEFAULT_HEIGHT;
+    public static String title = DEFAULT_TITLE;
+
     private long window;
     private ImmutableList<Consumer<Long>> windowConsumers;
     private ImmutableList<Runnable> renderRunners;
@@ -35,9 +41,9 @@ public class Window {
 
     public Window(int width, int height, String title, ImmutableList<Consumer<Long>> windowConsumers,
                   ImmutableList<Runnable> renderRunners) {
-        this.width = width;
-        this.height = height;
-        this.title = title;
+        Window.width = width;
+        Window.height = height;
+        Window.title = title;
         this.windowConsumers = windowConsumers;
         this.renderRunners = renderRunners;
     }
@@ -115,6 +121,7 @@ public class Window {
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             renderRunners.forEach(Runnable::run);
+            updateFrameTime();
 //            levelMap.render();
 //            player.render();
 
@@ -123,6 +130,13 @@ public class Window {
             // invoked during this call.
             glfwPollEvents();
         }
+    }
+
+    private void updateFrameTime() {
+        oldTime = time;
+        time = org.lwjgl.glfw.GLFW.glfwGetTime() * 1000;
+        frameTime = (time - oldTime) / 1000.0;
+//        System.out.println("[FPS=" + 1.0/frameTime + "]");
     }
 
     public void run() {

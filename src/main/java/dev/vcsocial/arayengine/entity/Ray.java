@@ -6,6 +6,7 @@ import dev.vcsocial.arayengine.util.DistanceUtil;
 import dev.vcsocial.arayengine.world.LevelMap;
 import dev.vcsocial.arayengine.world.Tile;
 import dev.vcsocial.arayengine.world.TileType;
+import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -25,7 +26,7 @@ public class Ray implements Renderable {
      */
 
     private final Entity eminator;
-    private Vector2f rayDirection;
+    private Vector2d rayDirection;
     private RayType rayType;
     private float rayAngle;
     private final LevelMap levelMap;
@@ -34,6 +35,12 @@ public class Ray implements Renderable {
     private float rayDistanceToTarget;
     private int rayIndex = -1;
 
+    public Ray(Entity eminator, LevelMap levelMap) {
+        this.eminator = eminator;
+        this.levelMap = levelMap;
+        this.rayDirection = new Vector2d();
+    }
+
     public Ray(Entity eminator, float rayAngle, LevelMap levelMap) {
         this.eminator = eminator;
         this.rayAngle = rayAngle;
@@ -41,6 +48,22 @@ public class Ray implements Renderable {
         rayPosition = new Vector2f(0, 0);
         rayOffset = new Vector2f(0, 0);
 
+    }
+
+    public Vector2d getRayDirection() {
+        return rayDirection;
+    }
+
+    public void setRayDirection(Vector2d rayDirection) {
+        this.rayDirection = rayDirection;
+    }
+
+    public void setRayDirectionX(double x) {
+        rayDirection.x = x;
+    }
+
+    public void setRayDirectionY(double y) {
+        rayDirection.y = y;
     }
 
     private static int shiftBitsSymmetricBy(float x, int shiftValue) {

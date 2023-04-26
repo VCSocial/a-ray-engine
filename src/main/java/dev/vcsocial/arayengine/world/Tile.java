@@ -1,19 +1,17 @@
 package dev.vcsocial.arayengine.world;
 
-import dev.vcsocial.arayengine.common.GlColorCompatible;
-
-import java.awt.*;
+import dev.vcsocial.arayengine.common.GlColor;
 
 public class Tile {
     private static final int tileSize = 64;
     private final TileType tileType;
-    private final GlColorCompatible tileColor;
+    private final GlColor tileColor;
 
     private Tile(TileType tileType) {
-        this(tileType, new GlColorCompatible(255, 0 ,0));
+        this(tileType, new GlColor(255, 0 ,0));
     }
 
-    private Tile(TileType tileType, GlColorCompatible color) {
+    private Tile(TileType tileType, GlColor color) {
         this.tileType = tileType;
         this.tileColor = color;
     }
@@ -26,7 +24,7 @@ public class Tile {
         return tileType;
     }
 
-    public GlColorCompatible getTileColor() {
+    public GlColor getTileColor() {
         return tileColor;
     }
 
@@ -34,8 +32,8 @@ public class Tile {
         return new Tile(TileType.WALL);
     }
 
-    public static Tile wallColored(Color c) {
-        return new Tile(TileType.WALL, new GlColorCompatible(c.getRed(), c.getGreen(), c.getBlue()));
+    public static Tile wallColored(GlColor c) {
+        return new Tile(TileType.WALL, c);
     }
 
     public static Tile floor() {

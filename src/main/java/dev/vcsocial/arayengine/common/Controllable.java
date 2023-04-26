@@ -1,17 +1,21 @@
 package dev.vcsocial.arayengine.common;
 
+import dev.vcsocial.arayengine.EntryPoint;
+import dev.vcsocial.arayengine.window.Window;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public interface Controllable {
-    static final IntList velocityRelevantKeys = IntArrayList.newListWith(GLFW_KEY_S, GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_D);
+    IntList velocityRelevantKeys = IntArrayList.newListWith(GLFW_KEY_S, GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_D);
 
+    default double getSpeed() {
+        return Window.frameTime * 5;
+    }
 
-    default float getSpeed() {
-        return 5;
+    default double getRotationSpeed() {
+        return Window.frameTime * 3;
     }
 
     default void initControls(long window) {
@@ -20,37 +24,32 @@ public interface Controllable {
                 glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
             }
 
+            if (key == GLFW_KEY_TAB && action == GLFW_RELEASE) {
+                EntryPoint.LEVEL_MAP.toggleRendering();
+            }
+
             if (action != GLFW_RELEASE &&  velocityRelevantKeys.contains(key)) {
-                var velocity = new Vector2f(0, 0);
                 if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-//                    velocity = new Vector2f(velocity.x, velocity.y - 1);
-                    updateX();
+                    moveForward();
                 }
                 if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-//                    velocity = new Vector2f(velocity.x, velocity.y + 1);
-                    updateY();
+                    moveBackward();
                 }
                 if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-//                    velocity = new Vector2f(velocity.x - 1, velocity.y);
-                    updateAngle(-0.1f);
+                    rotateLeft();
                 }
                 if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-//                    velocity = new Vector2f(velocity.x + 1, velocity.y);
-                    updateAngle(0.1f);
+                    rotateRight();
                 }
-
-//                velocity = velocity.normalize().mul(getSpeed());
-//                updateX(velocity.x);
-//                updateY(velocity.y);
-//                updateX();
-//                updateY();
             }
         });
     }
 
-    void updateX();
+    void moveForward();
 
-    void updateY();
+    void moveBackward();
 
-    void updateAngle(float updateIncrement);
+    void rotateLeft();
+
+    void rotateRight();
 }

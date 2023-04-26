@@ -1,33 +1,29 @@
 package dev.vcsocial.arayengine.world;
 
+import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.common.Renderable;
+import dev.vcsocial.arayengine.window.Window;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.FixedSizeList;
 import org.eclipse.collections.api.list.MutableList;
 
-import java.awt.Color;
-
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glVertex2i;
+import static org.lwjgl.opengl.GL11.*;
 
 public class LevelMap implements Renderable {
 
     private static final FixedSizeList<Tile> DEFAULT_TILE_MAP = Lists.fixedSize.of(
             Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.wall(), Tile.floor(), Tile.floor(), Tile.wall(),
             Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.floor(), Tile.wallColored(Color.BLUE), Tile.floor(), Tile.wall(),
-            Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wallColored(Color.GREEN),
+            Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wall(),
+            Tile.wall(), Tile.floor(), Tile.floor(), Tile.wallColored(GlColor.BLUE), Tile.floor(), Tile.wall(),
+            Tile.wall(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.floor(), Tile.wallColored(GlColor.GREEN),
             Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall(), Tile.wall()
     );
 
     private final int width;
     private final int height;
     private final FixedSizeList<Tile> tileMap;
-    private boolean ranAlready = true;
+    private boolean toggleRenderEnabled = false;
 
     public LevelMap(int width, int height) {
         this(width, height, generateTileList(width, height));
@@ -44,7 +40,11 @@ public class LevelMap implements Renderable {
         return new LevelMap(6,6, DEFAULT_TILE_MAP);
     }
 
-    // Buggy
+    public void toggleRendering() {
+        toggleRenderEnabled = !toggleRenderEnabled;
+    }
+
+    // TODO Buggy
     private static FixedSizeList<Tile> generateTileList(int width, int height) {
         MutableList<Tile> mapper = Lists.mutable.empty();
         for (int x = 0; x < (width * height); x++) {
@@ -82,7 +82,6 @@ public class LevelMap implements Renderable {
         return height;
     }
 
-    // TODO remove null
     public TileType getTileTypeAt(int x, int y) {
         var tile = getTile(x, y);
         if (tile != null) {
@@ -100,30 +99,49 @@ public class LevelMap implements Renderable {
     }
 
     public void render() {
-        // width * x + y
-        // solve for y =
+        if (toggleRenderEnabled) {
+            // Identify middle of the screen and identify point half way offset using height and width
+            var xA = (Window.width/ Tile.getTileSize() / 2) - (width / 2);
+            var yA = (Window.height / Tile.getTileSize() / 2) - (height / 2);
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (!ranAlready) {
-                    System.out.println("Indexing: [x=" + x + "], [y=" + y + "]");
-                }
+            // Draw each grid item
+            for (int i = 0 ; i < tileMap.size(); i++) {
 
-                if (TileType.WALL.equals(getTile(x, y).getTileType())) {
+                // Extract x and y coordinates
+                int x = i % width;
+                int y = i / height;
+
+                // Begin drawing at offset
+                int xo = (x + xA) * Tile.getTileSize();
+                int yo = (y + yA) * Tile.getTileSize();
+
+//                glBegin(GL_QUADS);
+//                glColor4f(0.25f,0.25f,0.25f, 1f);
+//                glVertex2i(0, 0);
+//                glVertex2i(0, height);
+//                glVertex2i(width, height);
+//                glVertex2i(width, 0);
+//                glEnd();
+
+                glBegin(GL_QUADS);
+
+                // Draw grid item outline
+                if (!TileType.WALL.equals(getTile(x, y).getTileType())) {
                     glColor3f(1,1,1);
-                    if (!ranAlready) {
-                        System.out.println("Detected WALL at: [x=" + x + "], [y=" + y + "]");
-                    }
                 } else {
                     glColor3f(0,0,0);
-                    if (!ranAlready) {
-                        System.out.println("Detected FLOOR at: [x=" + x + "], [y=" + y + "]");
-                    }
                 }
+                glVertex2i(xo, yo);
+                glVertex2i(xo, yo + Tile.getTileSize());
+                glVertex2i(xo + Tile.getTileSize(), yo + Tile.getTileSize());
+                glVertex2i(xo + Tile.getTileSize(), yo);
 
-                int xo = x * Tile.getTileSize();
-                int yo = y * Tile.getTileSize();
-                glBegin(GL_QUADS);
+                // Draw grid item
+                if (TileType.WALL.equals(getTile(x, y).getTileType())) {
+                    glColor3f(1,1,1);
+                } else {
+                    glColor3f(0,0,0);
+                }
                 glVertex2i(xo + 1, yo + 1);
                 glVertex2i(xo + 1, yo + Tile.getTileSize() - 1);
                 glVertex2i(xo + Tile.getTileSize() - 1, yo + Tile.getTileSize() - 1);
@@ -131,20 +149,6 @@ public class LevelMap implements Renderable {
                 glEnd();
             }
         }
-        ranAlready = true;
-//
-//        for (int i = 0; i < tileMap.size(); i++) {
-//            if (TileType.WALL.equals(tileMap.get(i).getTileType())) {
-//                glColor3f(1,1,1);
-//            } else {
-//                glColor3f(0,0,0);
-//            }
-//
-//            int xo =
-//
-//
-//
-//        }
     }
 
     public static LevelMap getFixedClosedMap(int width, int height) {
