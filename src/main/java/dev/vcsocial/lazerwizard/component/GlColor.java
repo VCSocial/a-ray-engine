@@ -3,6 +3,8 @@ package dev.vcsocial.lazerwizard.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 
+import java.util.Objects;
+
 public class GlColor implements Component {
     private static final float OPAQUE = 1f;
 
@@ -35,5 +37,21 @@ public class GlColor implements Component {
         this.g = g;
         this.b = b;
         this.alpha = alpha;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GlColor glColor = (GlColor) o;
+        return Float.compare(glColor.r, r) == 0
+                && Float.compare(glColor.g, g) == 0
+                && Float.compare(glColor.b, b) == 0
+                && Float.compare(glColor.alpha, alpha) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(r, g, b, alpha);
     }
 }

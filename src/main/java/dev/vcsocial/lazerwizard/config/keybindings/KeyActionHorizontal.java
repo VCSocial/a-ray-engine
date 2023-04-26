@@ -12,6 +12,7 @@ public enum KeyActionHorizontal implements KeyAction {
         this.isRepeatable = isRepeatable;
     }
 
+    @Override
     public boolean isActionRepeatable() {
         return isRepeatable;
     }

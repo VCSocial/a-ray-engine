@@ -1,5 +1,7 @@
 package dev.vcsocial.lazerwizard.config.keybindings;
 
 public interface KeyAction {
-    boolean isActionRepeatable();
+    default boolean isActionRepeatable() {
+        return false;
+    }
 }

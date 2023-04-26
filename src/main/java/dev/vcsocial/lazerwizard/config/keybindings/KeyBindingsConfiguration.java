@@ -24,7 +24,8 @@ public class KeyBindingsConfiguration {
                 PrimitiveTuples.pair(GLFW.GLFW_KEY_D, GLFW.GLFW_PRESS), KeyActionHorizontal.STRAFE_RIGHT
         );
 
-        keyMappings.put(PrimitiveTuples.pair(GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_RELEASE), KeyActionManagement.QUIT_GAME );
+        keyMappings.put(PrimitiveTuples.pair(GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_RELEASE), KeyActionManagement.QUIT_GAME);
+        keyMappings.put(PrimitiveTuples.pair(GLFW.GLFW_KEY_G, GLFW.GLFW_RELEASE), KeyActionManagement.TOGGLE_WIREFRAME);
     }
 
     public void replaceKeyMapping(KeyAction action, int glfwKey, int glfwAction) {
@@ -51,14 +52,20 @@ public class KeyBindingsConfiguration {
                 return KeyActionHorizontal.INVALID;
             }
         }
+        LOGGER.trace("Determined key was not already pressed and released");
 
         // Continue key action if repeat is found for repeatable key
         if (action == null && GLFW.GLFW_REPEAT == glfwAction) {
             action = keyMappings.get(PrimitiveTuples.pair(glfwKey, GLFW.GLFW_PRESS));
-            if (action.isActionRepeatable()) {
+            if (action != null && action.isActionRepeatable()) {
+                LOGGER.trace("Repeating [keyAction={}] [keyActionType={}]", action,
+                        action.getClass().getName());
                 return action;
             }
         }
+
+        LOGGER.trace("Found [keyAction={}] [keyActionType={}]", action,
+                action != null ? action.getClass().getName() : null);
         return action;
     }
 }

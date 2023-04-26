@@ -66,8 +66,12 @@ public class RayCastingSystem extends IteratingSystem implements EntitySystemOrL
 
     private List<LineMesh> computeRays(PositionComponent position, Vector2f direction, Vector2f plane) {
         List<LineMesh> lineMeshList = Lists.mutable.empty();
+        List<LineMesh> lineMeshWallList = Lists.mutable.empty();
+        List<LineMesh> lineMeshFloorList = Lists.mutable.empty();
+        List<LineMesh> lineMeshCeilingList = Lists.mutable.empty();
 
-        for (int x = 0; x < windowWidth; x++) {
+        int step = windowWidth / (windowWidth / 2);
+        for (int x = 0; x < windowWidth; x += step) {
             float cameraX = 2.0f * x / windowWidth - 1;
 
             float rayDirectionX = direction.x + plane.x * cameraX;
@@ -134,22 +138,95 @@ public class RayCastingSystem extends IteratingSystem implements EntitySystemOrL
                 color = new GlColor(color.r / 2, color.g / 2, color.b / 2, color.alpha);
             }
             var lineMeshWall = computeVertical(x, drawStart, drawEnd, color);
-            var lineMeshFloor = computeVertical(x, 0, drawStart, new GlColor(0.25f,0.25f, 0.25f, 1 ));
+            var lineMeshFloor = computeVertical(x, 0, drawStart, new GlColor(0.25f, 0.25f, 0.25f, 1));
             var lineMeshCeiling = computeVertical(x, drawEnd, windowHeight, new GlColor(0.75f, 0.75f, 0.75f, 1));
 
             if (lineMeshWall != null) {
                 lineMeshList.add(lineMeshWall);
+                lineMeshWallList.add(lineMeshWall);
             }
             if (lineMeshFloor != null) {
                 lineMeshList.add(lineMeshFloor);
+                lineMeshFloorList.add(lineMeshFloor);
             }
             if (lineMeshCeiling != null) {
                 lineMeshList.add(lineMeshCeiling);
+                lineMeshCeilingList.add(lineMeshCeiling);
             }
-//            lineMeshList.add(new LineMesh(x, toNdc(0f, false), drawStart, GlColor.BLACK)); //  TODO Giant black line in middle of screen :D
-//            lineMeshList.add(computeVertical());
         }
-        return lineMeshList;
+
+//        var w = reduceVerticesToTrianglesByPositionAndColorF(lineMeshWallList);
+//        var f = reduceVerticesToTrianglesByPositionAndColorF(lineMeshFloorList);
+//        var c = reduceVerticesToTrianglesByPositionAndColorF(lineMeshCeilingList);
+
+        List<LineMesh> combined = Lists.mutable.empty();
+        combined.addAll(lineMeshFloorList);
+//        combined.addAll(lineMeshCeilingList);
+        combined.addAll(lineMeshWallList);
+
+        return combined;
+//        return lineMeshList;
+    }
+
+    // Sample every 8 points
+    public List<LineMesh> reduceVerticesToTrianglesByPositionAndColorF(List<LineMesh> lineMeshList) {
+        List<LineMesh> newList = Lists.mutable.empty();
+        int step = windowWidth / (windowWidth / 2);
+
+        if (!lineMeshList.isEmpty()) {
+            for (int i = 0; i < lineMeshList.size(); i += step) {
+                newList.add(lineMeshList.get(i));
+            }
+            newList.add(lineMeshList.get(lineMeshList.size() - 1));
+        }
+        return newList;
+    }
+
+//    public List<LineMesh> reduceVerticesToTrianglesByPositionAndColor(List<LineMesh> lineMeshList) {
+//        List<LineMesh> newList = Lists.mutable.empty();
+//        LineMesh previous = null;
+//
+//        for (int i = 0; i < lineMeshList.size(); i++) {
+//            if (i != lineMeshList.size() - 1 && !newList.isEmpty()) {
+//                var current = lineMeshList.get(i);
+//
+//                if ((previous != null && !current.color.equals(previous.color))) {
+//                    newList.add(current);
+//                    previous = current;
+//                }
+//            } else {
+//                // Add to new list unconditionally if first or last element
+//                newList.add(lineMeshList.get(i));
+//                previous = lineMeshList.get(i);
+//            }
+//        }
+//
+//        return newList;
+//    }
+
+    //     Reduces these to triangles but causes wall push back effect
+    public List<LineMesh> reduceVerticesToTrianglesByPositionAndColor(List<LineMesh> lineMeshList) {
+        List<LineMesh> newList = Lists.mutable.empty();
+        LineMesh previous = null;
+
+        for (int i = 0; i < lineMeshList.size(); i++) {
+            if (i != lineMeshList.size() - 1 && !newList.isEmpty()) {
+                var current = lineMeshList.get(i);
+                var upcoming = lineMeshList.get(i + 1);
+
+                if ((previous != null && !upcoming.color.equals(previous.color))) {
+                    newList.add(current);
+                    newList.add(upcoming);
+                    previous = upcoming;
+                }
+            } else {
+                // Add to new list unconditionally if first or last element
+                newList.add(lineMeshList.get(i));
+                previous = lineMeshList.get(i);
+            }
+        }
+
+        return newList;
     }
 
     @Override

@@ -1,14 +1,13 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec4 aColor;
-//layout (location = 2) in vec2 aTexCoord;
+layout (location = 0) in vec3 inPosition;
+layout (location = 1) in vec4 inColor; // Replace this with normals eventually
+// layout (location = 2) in vec2 inUv;
 
-out vec4 ourColor;
-//out vec2 TexCoord;
+out vec4 colorCoordinates;
+// out vec2 uvCoordinates;
 
-void main()
-{
-    gl_Position = vec4(aPos, 1.0);
-    ourColor = aColor;
-    //TexCoord = aTexCoord;
+void main() {
+    gl_Position = vec4(inPosition, 1.0);
+    colorCoordinates = inColor;
+    //uvCoordinates = inUv;
 }

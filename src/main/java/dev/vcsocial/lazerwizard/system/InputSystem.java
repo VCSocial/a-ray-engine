@@ -95,6 +95,7 @@ public class InputSystem extends IteratingSystem implements Listener<InputSignal
 
         if (latestKeyActionManagement != null) {
             keyboardInput.keyActionManagement = latestKeyActionManagement;
+            latestKeyActionManagement = KeyActionManagement.INVALID;
             LOGGER.trace("Set [keyActionManagement={}]", keyboardInput.keyActionManagement);
         }
 

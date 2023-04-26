@@ -19,6 +19,10 @@ public class Texture {
         this.glTextureIndex = glTextureIndex;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void activate() {
         GL33.glActiveTexture(glTextureIndex);
         GL33.glBindTexture(GL_TEXTURE_2D, id);

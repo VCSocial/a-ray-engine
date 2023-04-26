@@ -56,9 +56,9 @@ public class WindowManager implements AutoCloseable {
         GL33.glEnable(GL33.GL_DEPTH_TEST | GL33.GL_STENCIL_TEST);
 
         // Set back to be culled based on counterclockwise indexing
-        GL33.glEnable(GL33.GL_CULL_FACE);
-        GL33.glCullFace(GL33.GL_BACK);
-        GL33.glFrontFace(GL33.GL_CCW);
+//        GL33.glEnable(GL33.GL_CULL_FACE);
+//        GL33.glCullFace(GL33.GL_BACK);
+//        GL33.glFrontFace(GL33.GL_CCW);
     }
 
     public boolean shouldWindowClose() {
@@ -113,8 +113,8 @@ public class WindowManager implements AutoCloseable {
         });
 
         // Hide the cursor when it enters the screen
-//        GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-        GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+//        GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
         // Get the thread stack and push a new frame
