@@ -58,6 +58,14 @@ public class WindowManager implements AutoCloseable {
         return window;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     @PostConstruct
     public void initialize() {
         GLFWErrorCallback.createPrint(System.err).set();

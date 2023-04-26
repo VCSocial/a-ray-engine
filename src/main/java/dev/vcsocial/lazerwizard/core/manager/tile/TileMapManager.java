@@ -1,4 +1,4 @@
-package dev.vcsocial.lazerwizard.world;
+package dev.vcsocial.lazerwizard.core.manager.tile;
 
 import dev.vcsocial.lazerwizard.common.GlColor;
 import dev.vcsocial.lazerwizard.component.TileType;
@@ -89,7 +89,7 @@ public class LevelMap {
 
     // TODO remove null
     public Tile getTile(int x, int y) {
-        var i = width * y + x;
+        var i = x * width + y;
         if (i >= tileMap.size() || i < 0 || x >= width || y >= height) {
             return null;
         }
