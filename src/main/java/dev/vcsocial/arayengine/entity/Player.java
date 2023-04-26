@@ -2,9 +2,7 @@ package dev.vcsocial.arayengine.entity;
 
 import dev.vcsocial.arayengine.common.Controllable;
 import dev.vcsocial.arayengine.common.GlColor;
-import dev.vcsocial.arayengine.common.GlColorCompatible;
 import dev.vcsocial.arayengine.common.Renderable;
-import dev.vcsocial.arayengine.util.AngleUtil;
 import dev.vcsocial.arayengine.window.Window;
 import dev.vcsocial.arayengine.world.LevelMap;
 import dev.vcsocial.arayengine.world.TileType;
@@ -17,11 +15,9 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Player implements Renderable, Controllable, Entity {
 
-    private static final double halfPi = Math.PI / 2;
-    private static final double thirdPi = 3 * Math.PI / 2;
     private static final float degInRad = 0.0174533f;
 
-    private static final GlColorCompatible DEFAULT_COLOR = new GlColorCompatible(255, 0, 255);
+    private static final GlColor DEFAULT_COLOR = new GlColor(255, 0, 255);
     private static final int DEFAULT_SIZE = 8;
 
     private final LevelMap levelMap;
@@ -29,78 +25,21 @@ public class Player implements Renderable, Controllable, Entity {
     private Vector2d position;
     private Vector2d direction;
     private Vector2d plane;
+    private boolean toggleRenderEnabled = false;
 
-    private double frameTime = 0;
-    private double time = 0;
-    private double oldTime = 0;
-
-    private float coordinateX;
-    private float coordinateY;
-    private float coordinateDeltaX;
-    private float coordinateDeltaY;
-    private float angle;
-
-    private GlColorCompatible color = DEFAULT_COLOR;
+    private final GlColor color;
     private int size = DEFAULT_SIZE;
 
     public Player(int coordinateX, int coordinateY, LevelMap levelMap) {
-        this.coordinateX = coordinateX;
-        this.coordinateY = coordinateY;
-        this.coordinateDeltaX = cos(angle) * 5;
-        this.coordinateDeltaY = sin(angle) * 5;
         this.levelMap = levelMap;
-
         position = new Vector2d(coordinateX, coordinateY);
-        direction = new Vector2d(1, 0);
-        plane = new Vector2d(0, -0.66);
+        direction = new Vector2d(-1, 0);
+        plane = new Vector2d(0, 0.66);
+        color = GlColor.GREEN;
     }
 
-    public float getCoordinateX() {
-        return coordinateX;
-    }
-
-    public void setCoordinateX(int coordinateX) {
-        this.coordinateX = coordinateX;
-    }
-
-    public float getCoordinateY() {
-        return coordinateY;
-    }
-
-    public void setCoordinateY(int coordinateY) {
-        this.coordinateY = coordinateY;
-    }
-
-    public float getCoordinateDeltaX() {
-        return coordinateDeltaX;
-    }
-
-    public void setCoordinateDeltaX(float coordinateDeltaX) {
-        this.coordinateDeltaX = coordinateDeltaX;
-    }
-
-    public float getCoordinateDeltaY() {
-        return coordinateDeltaY;
-    }
-
-    public void setCoordinateDeltaY(float coordinateDeltaY) {
-        this.coordinateDeltaY = coordinateDeltaY;
-    }
-
-    public float getAngle() {
-        return angle;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
-    }
-
-    public GlColorCompatible getColor() {
+    public GlColor getColor() {
         return color;
-    }
-
-    public void setColor(GlColorCompatible color) {
-        this.color = color;
     }
 
     public int getSize() {
@@ -133,28 +72,6 @@ public class Player implements Renderable, Controllable, Entity {
 
     public void setPlane(Vector2d plane) {
         this.plane = plane;
-    }
-
-    public void updateX() {
-        coordinateX += coordinateDeltaX;
-        coordinateY += coordinateDeltaY;
-    }
-
-    public void updateY() {
-        coordinateX -= coordinateDeltaX;
-        coordinateY -= coordinateDeltaY;
-    }
-
-    public void updateAngle(float a) {
-        angle += a;
-        if (angle < 0) {
-            angle += (2 * Math.PI);
-        } else if ((2 * Math.PI) < angle) {
-            angle -= (2 * Math.PI);
-        }
-
-        coordinateDeltaX = cos(angle) * 5;
-        coordinateDeltaY = sin(angle) * 5;
     }
 
     // https://lodev.org/cgtutor/raycasting.html#The_Basic_Idea_
@@ -231,17 +148,18 @@ public class Player implements Renderable, Controllable, Entity {
             if (drawStart >= Window.height) {
                 drawEnd = Window.height - 1;
             }
-            GlColor color = levelMap.getTile(mapX, mapY).getTileColor();
 
+            GlColor color = levelMap.getTile(mapX, mapY).getTileColor();
             if (side == 1) {
                 color.shadeBy(0.5f);
             }
-
-            verLine(x, drawStart, drawEnd, color);
+            renderVerticalLine(x, drawStart, drawEnd, color);
         }
     }
 
-    void verLine(int x, int y1, int y2, GlColor color) {
+    // Draws a vertical line on the screen ported from the lodev tutorial more or less verbatim
+    // TODO understand this better and come up with my own solution better fitted fro Java
+    private void renderVerticalLine(int x, int y1, int y2, GlColor color) {
         if (y2 < y1) {
             y1 += y2;
             y2 = y1 - y2;
@@ -252,9 +170,9 @@ public class Player implements Renderable, Controllable, Entity {
             return;
         }//no single point of the line is on screen
 
-
-        if (y1 < 0)
+        if (y1 < 0) {
             y1 = 0; //clip
+        }
 
         if (y2 >= Window.width)
             y2 = Window.height - 1; //clip
@@ -316,7 +234,7 @@ public class Player implements Renderable, Controllable, Entity {
         plane.y = oldPlaneX * sin(-getRotationSpeed()) + plane.y * cos(-getRotationSpeed());
     }
 
-    private GlColorCompatible shaded(GlColorCompatible c, float shade) {
+    private GlColor shaded(GlColor c, float shade) {
         var r = c.getRed() == 0
                 ? 0
                 : c.getRed() * shade;
@@ -329,228 +247,19 @@ public class Player implements Renderable, Controllable, Entity {
                 ? 0
                 : c.getBlue() * shade;
 
-        return new GlColorCompatible((int) r, (int) g, (int) b);
+        return new GlColor((int) r, (int) g, (int) b);
+    }
+
+    public void toggleRendering() {
+        toggleRenderEnabled = !toggleRenderEnabled;
     }
 
     @Override
     public Vector2i getMapPosition() {
-        return new Vector2i((int) coordinateX, (int) coordinateY);
+        return new Vector2i((int) position.x, (int) position.y);
     }
-
-    public void temp2() {
-        int castLimit = 60;
-        float distanceTotal = 0;
-        float rayAngleFromCaster = AngleUtil.addLimitToCirlce(angle, -(degInRad *30));
-
-        for (int rayIndex = 0; rayIndex < castLimit; rayIndex++) {
-            var ray = new Ray(this, rayAngleFromCaster, levelMap);
-            rayAngleFromCaster = ray.calculateRay(rayAngleFromCaster, rayIndex);
-        }
-    }
-
-//    public void temp() {
-//        int r, mx, my, mp, dof;
-//        float rx, ry, ra, xo, yo, distT;
-//        ra = AngleUtil.addLimitToCirlce( angle, -(degInRad * 30));
-//
-//        for (r = 0; r < 60; r++) {
-//            GlColorCompatible color = new GlColorCompatible(255, 0, 0);
-//
-//            rx = 0;
-//            ry = 0;
-//            xo = 0;
-//            yo = 0;
-//
-//            dof = 0;
-//            float distanceH = Float.MAX_VALUE;
-//            float hx = coordinateX;
-//            float hy = coordinateY;
-//            float aTan = -1 / tan(ra);
-//            if (ra > Math.PI) {
-//                ry = (((int) coordinateY >> 6) << 6) - 0.0001f;
-//                rx = (coordinateY - ry) * aTan + coordinateX;
-//                yo = -Tile.getTileSize();
-//                xo = -yo * aTan;
-//            }
-//
-//            if (ra < Math.PI) {
-//                ry = (((int) coordinateY >> 6) << 6) + Tile.getTileSize();
-//                rx = (coordinateY - ry) * aTan + coordinateX;
-//                yo = Tile.getTileSize();
-//                xo = -yo * aTan;
-//            }
-//
-//            if (ra == 0 || ra == Math.PI) {
-//                rx = coordinateX;
-//                ry = coordinateY;
-//                dof = 8;
-//            }
-//
-//            if (r== 59) {
-//                glColor3f(1, 0, 0);
-//                glPointSize(16);
-//                glBegin(GL_POINTS);
-//                glVertex2f(rx, ry);
-//                glEnd();
-//
-//                glColor3f(1, 1, 0);
-//                glPointSize(16);
-//                glBegin(GL_POINTS);
-//                glVertex2f(xo, yo);
-//                glEnd();
-//            }
-//
-//            while (dof < 8) {
-//                if (rx == 0 || ry == 0 || xo == 0 || yo == 0) {
-//                    continue;
-//                }
-//
-//                mx = (int) rx >> 6;
-//                my = (int) ry >> 6;
-//                mp = my * levelMap.getWidth() + mx;
-//                if (mp < levelMap.getWidth() * levelMap.getHeight()
-//                        && mp > -1
-//                        && TileType.WALL.equals(levelMap.getTileTypeAt(mp))) {
-//                    hx = rx;
-//                    hy = ry;
-//                    distanceH = DistanceUtil.distance(coordinateX, coordinateY, hx, hy, ra);
-////                    color = levelMap.getTile(mp).getTileColor();
-//                    dof = 8;
-//                } else {
-//                    rx += xo;
-//                    ry += yo;
-//                    dof += 1;
-//                }
-//            }
-//
-//            rx = 0;
-//            ry = 0;
-//            xo = 0;
-//            yo = 0;
-//
-//            dof = 0;
-//            float distanceV = Float.MAX_VALUE;
-//            float vx = coordinateX;
-//            float vy = coordinateY;
-//            float nTan = -tan(ra);
-//            if (ra > halfPi && ra < thirdPi) {
-//                rx = (((int) coordinateX >> 6) << 6) - 0.0001f;
-//                ry = (coordinateX - rx) * nTan + coordinateY;
-//                xo = -Tile.getTileSize();
-//                yo = -xo * nTan;
-//            }
-//
-//            if (ra < halfPi || ra > thirdPi) {
-//                rx = (((int) coordinateX >> 6) << 6) + Tile.getTileSize();
-//                ry = (coordinateX - rx) * nTan + coordinateY;
-//                xo = Tile.getTileSize();
-//                yo = -xo * nTan;
-//            }
-//
-//            if (ra == 0 || ra == Math.PI) {
-//                rx = coordinateX;
-//                ry = coordinateY;
-//                dof = 8;
-//            }
-//
-//            if (r == 59) {
-//                glColor3f(0, 0, 1);
-//                glPointSize(16);
-//                glBegin(GL_POINTS);
-//                glVertex2f(rx, ry);
-//                glEnd();
-//
-//                glColor3f(0, 1, 1);
-//                glPointSize(16);
-//                glBegin(GL_POINTS);
-//                glVertex2f(xo, yo);
-//                glEnd();
-//            }
-//
-//            while (dof < 8) {
-//                if (rx == 0 || ry == 0 || xo == 0 || yo == 0) {
-//                    continue;
-//                }
-//
-//                mx = (int) rx >> 6;
-//                my = (int) ry >> 6;
-//                mp = my * levelMap.getWidth() + mx;
-//                if (mp < levelMap.getWidth() * levelMap.getHeight()
-//                        && mp > -1
-//                        && TileType.WALL.equals(levelMap.getTileTypeAt(mp))) {
-//                    vx = rx;
-//                    vy = ry;
-//                    distanceV = DistanceUtil.distance(coordinateX, coordinateY, vx, vy, ra);
-//                    dof = 8;
-////                    color = levelMap.getTile(mp).getTileColor();
-//                } else {
-//                    rx += xo;
-//                    ry += yo;
-//                    dof += 1;
-//                }
-//            }
-//
-//            if (distanceV < distanceH) {
-//                rx = vx;
-//                ry = vy;
-//                distT = distanceV;
-//            } else {
-//                rx = hx;
-//                ry = hy;
-//                distT = distanceH;
-//            }
-//
-//            glColor3f(1, 0, 0);
-//            glLineWidth(3);
-//            glBegin(GL_LINES);
-//            glVertex2f(coordinateX, coordinateY);
-//            glVertex2f(rx, ry);
-//            glEnd();
-//
-//            if (distanceV < distanceH) {
-//                color = shaded(color, 0.9f);
-//            } else {
-//                color = shaded(color, 0.7f);
-//            }
-//            glColor3f(color.getRedAsFloat(), color.getGreenAsFloat(), color.getBlueAsFloat());
-//
-//            // Draw 3D --- :D
-//            float ca = AngleUtil.addLimitToCirlce( angle, -ra);
-//            distT = distT * cos(ca);
-//
-//            float lineH = (levelMap.getWidth() * levelMap.getWidth() * 320) / distT;
-//            float lineO = 160 - lineH / 2;
-//            lineH = lineH > 320
-//                    ? 320
-//                    : lineH;
-//
-//            glLineWidth(8);
-//            glBegin(GL_LINES);
-//            glVertex2f(r * 8 + 530, lineO);
-//            glVertex2f(r * 8 + 530, (lineH + lineO));
-//            glEnd();
-//
-//            ra = AngleUtil.addLimitToCirlce(ra, degInRad);
-//        }
-//    }
-
-
-
 
     public void render() {
         cast();
-
-//        glColor3f(color.getRedAsFloat(), color.getGreenAsFloat(), color.getBlueAsFloat());
-//        glPointSize(size);
-//        glBegin(GL_POINTS);
-//        glVertex2f(coordinateX, coordinateY);
-//        glEnd();
-//
-//        glLineWidth(30);
-//        glBegin(GL_LINES);
-//        glVertex2f(coordinateX, coordinateY);
-//        glVertex2f(coordinateX + coordinateDeltaX * 75, coordinateY + coordinateDeltaY * 75);
-//        glEnd();
-
     }
 }

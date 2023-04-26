@@ -1,5 +1,6 @@
 package dev.vcsocial.arayengine.world;
 
+import dev.vcsocial.arayengine.EntryPoint;
 import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.common.Renderable;
 import dev.vcsocial.arayengine.window.Window;
@@ -100,6 +101,10 @@ public class LevelMap implements Renderable {
 
     public void render() {
         if (toggleRenderEnabled) {
+            var playerPosition = EntryPoint.PLAYER.getPosition();
+//            var playerDirection = EntryPoint.PLAYER.getDirection();
+
+
             // Identify middle of the screen and identify point half way offset using height and width
             var xA = (Window.width/ Tile.getTileSize() / 2) - (width / 2);
             var yA = (Window.height / Tile.getTileSize() / 2) - (height / 2);
@@ -147,6 +152,23 @@ public class LevelMap implements Renderable {
                 glVertex2i(xo + Tile.getTileSize() - 1, yo + Tile.getTileSize() - 1);
                 glVertex2i(xo - 1 + Tile.getTileSize(), yo + 1);
                 glEnd();
+
+                double playerX = (playerPosition.x + xA) * Tile.getTileSize();
+                double playerY = (playerPosition.y + yA) * Tile.getTileSize();
+                glColor3f(0, 1, 0);
+                glPointSize(16);
+                glBegin(GL_POINTS);
+                glVertex2d(playerX, playerY);
+                glEnd();
+
+                // TODO convert to flat top down view
+//                double directionX = (playerDirection.x + xA) * Tile.getTileSize();
+//                double directionY = (playerDirection.y + yA) * Tile.getTileSize();
+//                glLineWidth(30);
+//                glBegin(GL_LINES);
+//                glVertex2d(playerX, playerY);
+//                glVertex2d(playerX + directionX, playerY + directionY);
+//                glEnd();
             }
         }
     }

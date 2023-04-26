@@ -1,5 +1,6 @@
 package dev.vcsocial.arayengine.window;
 
+import dev.vcsocial.arayengine.diagnostics.FpsCounter;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -21,10 +22,6 @@ public class Window {
     private static final String DEFAULT_TITLE = "A Ray Engine";
     private static final int DEFAULT_WIDTH = 1920;
     private static final int DEFAULT_HEIGHT = 1080;
-
-    public static double time = org.lwjgl.glfw.GLFW.glfwGetTime();
-    public static double oldTime = time;
-    public static double frameTime = 0;
 
     // TODO Encapsulate?
     public static int width = DEFAULT_WIDTH;
@@ -99,7 +96,6 @@ public class Window {
         // Enable v-sync
         glfwSwapInterval(1);
 
-
         // Make the window visible
         glfwShowWindow(window);
     }
@@ -121,7 +117,7 @@ public class Window {
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             renderRunners.forEach(Runnable::run);
-            updateFrameTime();
+            FpsCounter.updateFrameTime();
 //            levelMap.render();
 //            player.render();
 
@@ -130,13 +126,6 @@ public class Window {
             // invoked during this call.
             glfwPollEvents();
         }
-    }
-
-    private void updateFrameTime() {
-        oldTime = time;
-        time = org.lwjgl.glfw.GLFW.glfwGetTime() * 1000;
-        frameTime = (time - oldTime) / 1000.0;
-//        System.out.println("[FPS=" + 1.0/frameTime + "]");
     }
 
     public void run() {

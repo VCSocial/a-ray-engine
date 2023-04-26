@@ -9,7 +9,7 @@ import org.eclipse.collections.api.factory.Lists;
 public class EntryPoint {
 
     public static final LevelMap LEVEL_MAP = LevelMap.getDefaultLevelMap();
-    private static final Player PLAYER = new Player(2, 2, LEVEL_MAP);
+    public static final Player PLAYER = new Player(2, 2, LEVEL_MAP);
     private static final Window WINDOW = new Window(
             Lists.immutable.of(PLAYER::initControls),
             Lists.immutable.of(PLAYER::render, LEVEL_MAP::render)

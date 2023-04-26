@@ -1,7 +1,7 @@
 package dev.vcsocial.arayengine.common;
 
 import dev.vcsocial.arayengine.EntryPoint;
-import dev.vcsocial.arayengine.window.Window;
+import dev.vcsocial.arayengine.diagnostics.FpsCounter;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
@@ -11,11 +11,11 @@ public interface Controllable {
     IntList velocityRelevantKeys = IntArrayList.newListWith(GLFW_KEY_S, GLFW_KEY_W, GLFW_KEY_A, GLFW_KEY_D);
 
     default double getSpeed() {
-        return Window.frameTime * 5;
+        return FpsCounter.getFrameTime() * 5;
     }
 
     default double getRotationSpeed() {
-        return Window.frameTime * 3;
+        return FpsCounter.getFrameTime() * 3;
     }
 
     default void initControls(long window) {
@@ -26,6 +26,10 @@ public interface Controllable {
 
             if (key == GLFW_KEY_TAB && action == GLFW_RELEASE) {
                 EntryPoint.LEVEL_MAP.toggleRendering();
+            }
+
+            if (key == GLFW_KEY_F && action == GLFW_RELEASE) {
+                FpsCounter.toggleFpsCounter();
             }
 
             if (action != GLFW_RELEASE &&  velocityRelevantKeys.contains(key)) {
