@@ -3,7 +3,7 @@ package dev.vcsocial.lazerwizard.core.polling;
 import com.badlogic.ashley.signals.Signal;
 import dev.vcsocial.lazerwizard.core.helper.lifecycle.LifeCycleEventBroker;
 import dev.vcsocial.lazerwizard.core.helper.lifecycle.PostWindowInitializationEvent;
-import dev.vcsocial.lazerwizard.core.manager.WindowManager;
+import dev.vcsocial.lazerwizard.core.manager.window.WindowManager;
 import dev.vcsocial.lazerwizard.core.polling.signal.CursorInputSignal;
 import dev.vcsocial.lazerwizard.core.polling.signal.InputSignal;
 import dev.vcsocial.lazerwizard.core.polling.signal.MouseButtonInputSignal;
@@ -66,8 +66,12 @@ public class RawMouseInputPoller implements RawPoller {
                 }
 
                 if (deltaX != 0 || deltaY != 0) {
-                    mouseInputDetected.dispatch(new CursorInputSignal(deltaX <= -1 ? -1 : 1, deltaY <= -1 ? -1 : 1));
-                    LOGGER.trace("Dispatched mouse input detection");
+                    var c = deltaX == 0
+                            ? new CursorInputSignal(0, deltaY <= -1 ? -1 : 1)
+                            : new CursorInputSignal(deltaX <= -1 ? -1 : 1, 0);
+
+                    mouseInputDetected.dispatch(c);
+                    LOGGER.trace("Dispatched mouse input detection with [deltaX={}], [deltaY={}]", c.deltaX(), c.deltaY());
                 }
 
                 previousPosition.x = positionX;

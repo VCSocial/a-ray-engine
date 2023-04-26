@@ -1,7 +1,9 @@
 package dev.vcsocial.lazerwizard.core.manager.tile;
 
-import dev.vcsocial.lazerwizard.common.GlColor;
+import dev.vcsocial.lazerwizard.component.GlColor;
 import dev.vcsocial.lazerwizard.component.TileType;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -9,8 +11,11 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
 import org.joml.Vector2i;
 
-public class LevelMap {
+@Singleton
+public class TileMapManager {
 
+    private static final int DEFAULT_WIDTH = 6;
+    private static final int DEFAULT_HEIGHT = 6;
     private static final ImmutableList<Tile> DEFAULT_TILE_MAP = Lists.immutable.of(
             Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.PURPLE), Tile.wall(GlColor.GREEN), Tile.wall(GlColor.GREEN),
             Tile.wall(GlColor.YELLOW), Tile.floor(), Tile.floor(), Tile.wall(GlColor.BLUE), Tile.floor(), Tile.wall(GlColor.GREEN),
@@ -26,11 +31,20 @@ public class LevelMap {
     private final MutableMap<Tile, MutableList<Vector2i>> tileMutableListMutableMap;
     private boolean toggleRenderEnabled = false;
 
-    public LevelMap(int width, int height) {
+    @Inject
+    public TileMapManager() {
+        this.width = DEFAULT_WIDTH;
+        this.height = DEFAULT_HEIGHT;
+        this.tileMap = DEFAULT_TILE_MAP;
+        this.tileMutableListMutableMap = convertToTypeMap();
+    }
+
+
+    public TileMapManager(int width, int height) {
         this(width, height, generateTileList(width, height));
     }
 
-    public LevelMap(int width, int height, ImmutableList<Tile> tileMap) {
+    public TileMapManager(int width, int height, ImmutableList<Tile> tileMap) {
         this.width = width;
         this.height = height;
         this.tileMap = tileMap;
@@ -72,16 +86,9 @@ public class LevelMap {
         return Lists.immutable.ofAll(mapper);
     }
 
-    public static LevelMap getDefaultLevelMap() {
-        return new LevelMap(6,6, DEFAULT_TILE_MAP);
+    public static TileMapManager getDefaultLevelMap() {
+        return new TileMapManager(6,6, DEFAULT_TILE_MAP);
     }
-
-
-
-    public void toggleRendering() {
-        toggleRenderEnabled = !toggleRenderEnabled;
-    }
-
 
     public Tile getTile(int i) {
         return tileMap.get(i);

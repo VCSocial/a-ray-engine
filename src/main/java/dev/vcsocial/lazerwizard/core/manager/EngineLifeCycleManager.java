@@ -1,5 +1,6 @@
 package dev.vcsocial.lazerwizard.core.manager;
 
+import dev.vcsocial.lazerwizard.core.manager.window.WindowManager;
 import jakarta.inject.Singleton;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;

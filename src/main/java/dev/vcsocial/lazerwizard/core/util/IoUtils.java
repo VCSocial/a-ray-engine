@@ -1,6 +1,5 @@
 package dev.vcsocial.lazerwizard.core.util;
 
-import dev.vcsocial.lazerwizard.system.RenderingSystem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -54,7 +53,7 @@ public final class IoUtils {
         LOGGER.debug("Continuing to load texture [texturePath={}]", texturePath);
 
         try (var stack = MemoryStack.stackPush()) {
-            var url = RenderingSystem.class.getClassLoader().getResource(texturePath);
+            var url = IoUtils.class.getClassLoader().getResource(texturePath);
             var file = new File(url.toURI());
             var filePath = file.getAbsolutePath();
             LOGGER.debug("Resolved texture to be at [filePath={}]", filePath);
@@ -103,7 +102,7 @@ public final class IoUtils {
         var shaderSource = new StringBuilder();
         URI uri;
         try {
-            uri = RenderingSystem.class.getClassLoader().getResource(SHADER_ROOT + file).toURI();
+            uri = IoUtils.class.getClassLoader().getResource(SHADER_ROOT + file).toURI();
             LOGGER.debug("Shader was resolve at [uri={}]", uri);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to construct shader's path");

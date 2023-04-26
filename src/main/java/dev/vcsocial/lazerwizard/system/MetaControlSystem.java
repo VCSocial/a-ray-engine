@@ -3,9 +3,9 @@ package dev.vcsocial.lazerwizard.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import dev.vcsocial.lazerwizard.component.KeyboardInputComponent;
-import dev.vcsocial.lazerwizard.config.keybindings.KeyAction;
-import dev.vcsocial.lazerwizard.core.manager.WindowManager;
+import dev.vcsocial.lazerwizard.component.input.KeyboardInputComponent;
+import dev.vcsocial.lazerwizard.config.keybindings.KeyActionManagement;
+import dev.vcsocial.lazerwizard.core.manager.window.WindowManager;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +33,7 @@ public class MetaControlSystem extends IteratingSystem implements EntitySystemOr
         var keyInput = KeyboardInputComponent.COMPONENT_MAPPER.get(entity);
 
         LOGGER.trace("[keyInput={}]", keyInput);
-        if (KeyAction.QUIT_GAME.equals(keyInput.keyAction)) {
+        if (KeyActionManagement.QUIT_GAME.equals(keyInput.keyActionManagement)) {
             quit();
         }
     }

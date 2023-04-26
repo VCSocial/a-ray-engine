@@ -1,8 +1,8 @@
 package dev.vcsocial.lazerwizard.entity;
 
-import dev.vcsocial.lazerwizard.component.CursorInputComponent;
-import dev.vcsocial.lazerwizard.component.KeyboardInputComponent;
-import dev.vcsocial.lazerwizard.component.MouseButtonInputComponent;
+import dev.vcsocial.lazerwizard.component.input.CursorInputComponent;
+import dev.vcsocial.lazerwizard.component.input.KeyboardInputComponent;
+import dev.vcsocial.lazerwizard.component.input.MouseButtonInputComponent;
 
 public class Input extends AbstractEntity {
     private final KeyboardInputComponent keyboardInputComponent;

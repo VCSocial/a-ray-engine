@@ -3,16 +3,12 @@ package dev.vcsocial.lazerwizard.system.rendering;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import dev.vcsocial.lazerwizard.common.GlColor;
-import dev.vcsocial.lazerwizard.component.KeyboardInputComponent;
-import dev.vcsocial.lazerwizard.config.keybindings.KeyAction;
-import dev.vcsocial.lazerwizard.core.util.GlOperationsUtil;
+import dev.vcsocial.lazerwizard.component.input.KeyboardInputComponent;
 import dev.vcsocial.lazerwizard.core.util.IoUtils;
 import dev.vcsocial.lazerwizard.system.EntitySystemOrListener;
-import jakarta.inject.Singleton;
-import org.eclipse.collections.api.factory.Maps;
+import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.primitive.MutableIntList;
-import org.eclipse.collections.api.tuple.Triple;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.primitive.IntLists;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.lwjgl.BufferUtils;
@@ -22,15 +18,14 @@ import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Map;
+import java.util.List;
 
+import static org.joml.Math.abs;
 import static org.joml.Math.sin;
 import static org.lwjgl.opengl.GL33.*;
 
-@Singleton
+//@Singleton
 public class RenderingOpenGlSystem extends IteratingSystem implements EntitySystemOrListener, AutoCloseable {
-    private static final GlColor DEFAULT_BACKGROUND_COLOR = new GlColor(150, 50, 150);
-    private static final GlColor UPDATED_BACKGROUND_COLOR = new GlColor(50, 150, 50);
     private static final int FLOAT_SIZE = 4;
 
     /**
@@ -43,12 +38,24 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
 
     private Texture texture;
 
+    float oldVertices[] = {
+        // first triangle
+         0.5f,  0.5f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f,  0.5f, 0.0f,  // top left
+        // second triangle
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left
+    };
+
+
     float[] vertices = {
             // positions          // colors           // texture coords
-            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // top right
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom left
+            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f    // top left
     };
 
     int[] indices = {
@@ -72,30 +79,91 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
         elementBufferObjectList = IntLists.mutable.empty();
     }
 
-    public int[] generateIndiciesFromVertices(float[] vertices, int width) {
-        int stride = 3;
+    private boolean isEquivalent(Vertex a, Vertex b) {
+        return abs(a.x() - b.x()) < 0.01f
+                && abs(a.y() - b.y()) < 0.01f
+                && abs(a.z() - b.z()) < 0.01f;
+    }
 
-        int numberVertices = (vertices.length / width) * stride; // TODO expect 6 for hard coded test
-        Map<Triple, Integer> positions = Maps.mutable.ofInitialCapacity(numberVertices);
+    private boolean isEquivalent(Uv a, Uv b) {
+        return abs(a.x() - b.x()) < 0.01f
+                && abs(a.y() - b.y()) < 0.01f;
+    }
 
-        // TODO we can find the triples right but not the resulting indices
+    private boolean isEquivalent(PackedVertex a, PackedVertex b) {
+        return isEquivalent(a.vertex(), b.vertex())
+                && isEquivalent(a.uv(), b.uv());
+    }
+
+
+    private Pair<Boolean, Integer> isVertexEquivalent(PackedVertex packedVertex, List<PackedVertex> outgoing) {
+        for (int i = 0; i < outgoing.size(); i++) {
+            if (isEquivalent(packedVertex, outgoing.get(i))) {
+                return Tuples.pair(true, i);
+            }
+        }
+        return Tuples.pair(false, -1);
+    }
+
+    // Searches through all already-exported vertices
+    // for a similar one.
+    // Similar = same position + same UVs + same normal
+    public List<PackedVertex> generateIndiciesFromVertices(float[] vertices, int width) {
+        List<PackedVertex> outgoing = Lists.mutable.empty();
+        MutableIntList indices = IntLists.mutable.empty();
+
         for (int i = 0; i < vertices.length; i += width) {
-            float x = Float.MIN_VALUE;
-            float y = Float.MIN_VALUE;
-            float z = Float.MIN_VALUE;
-            for (int j = i; j < i + stride; j++) {
-                if (i + stride - j == 3) {
-                    x = vertices[j];
-                } else if (i + stride - j == 2) {
-                    y = vertices[j];
-                } else if (i + stride - j == 1) {
-                    z = vertices[j];
-                }
+            var packedVertex = new PackedVertex(
+                    new Vertex(vertices[i], vertices[i + 1], vertices[i + 2]),
+                    new Color(1, 0, 0, 1),
+                    new Uv(1, 1));
+//                    new Uv(vertices[j + 6], vertices[j + 7]));
+
+            var result = isVertexEquivalent(packedVertex, outgoing);
+
+            if (result.getOne()) {
+                indices.add(result.getTwo());
+            } else {
+                outgoing.add(packedVertex);
+                indices.add(outgoing.size() - 1);
             }
 
-            positions.put(Tuples.triple(x, y, z), i % width);
+
         }
 
+
+//        int stride = 3;
+//
+//        int numberVertices = (vertices.length / width) * stride; // TODO expect 6 for hard coded test
+//        Map<Triple, Integer> positions = Maps.mutable.ofInitialCapacity(numberVertices);
+//
+//        // TODO we can find the triples right but not the resulting indices
+//        for (int i = 0; i < vertices.length; i += width) {
+//            float x = Float.MIN_VALUE;
+//            float y = Float.MIN_VALUE;
+//            float z = Float.MIN_VALUE;
+//            for (int j = i; j < i + stride; j++) {
+//                if (i + stride - j == 3) {
+//                    x = vertices[j];
+//                } else if (i + stride - j == 2) {
+//                    y = vertices[j];
+//                } else if (i + stride - j == 1) {
+//                    z = vertices[j];
+//                }
+//            }
+//
+//            positions.put(Tuples.triple(x, y, z), positions.size());
+//        }
+
+        /*
+        For each input vertex
+
+            Try to find a similar ( = same for all attributes ) vertex between all those we already output
+            If found :
+                A similar vertex is already in the VBO, use it instead !
+            If not found :
+                No similar vertex found, add it to the VBO
+         */
 
 
 //        var val = positions.values();
@@ -104,7 +172,7 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
 //            indicesGen[i] = val.
 //        }
 
-        return new int[] {};
+        return outgoing;
     }
 
     private FloatBuffer toFloatBuffer(float[] data) {
@@ -213,8 +281,8 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
 
     @Override
     public void update(float deltaTime) {
-        clear();
-        super.update(deltaTime);
+//        clear();
+//        super.update(deltaTime);
     }
 
     @Override
@@ -223,22 +291,22 @@ public class RenderingOpenGlSystem extends IteratingSystem implements EntitySyst
 
         // LazerWizardLizard? TODO
 
-        if (KeyAction.FORWARD.equals(keyboardInput.keyAction)) {
-            GlOperationsUtil.glClearColor(UPDATED_BACKGROUND_COLOR);
-        } else if (KeyAction.BACKWARD.equals(keyboardInput.keyAction)) {
-            GlOperationsUtil.glClearColor(DEFAULT_BACKGROUND_COLOR);
-        } else if (KeyAction.STRAFE_LEFT.equals(keyboardInput.keyAction)) {
-//            render(load(vertexArray));
-            GL33.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        } else if (KeyAction.STRAFE_RIGHT.equals(keyboardInput.keyAction)) {
-            GL33.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
+//        if (KeyActionHorizontal.FORWARD.equals(keyboardInput.keyActionHorizontal)) {
+//            GlOperationsUtil.glClearColor(UPDATED_BACKGROUND_COLOR);
+//        } else if (KeyActionHorizontal.BACKWARD.equals(keyboardInput.keyActionHorizontal)) {
+//            GlOperationsUtil.glClearColor(DEFAULT_BACKGROUND_COLOR);
+//        } else if (KeyActionHorizontal.STRAFE_LEFT.equals(keyboardInput.keyActionHorizontal)) {
+////            render(load(vertexArray));
+//            GL33.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//        } else if (KeyActionHorizontal.STRAFE_RIGHT.equals(keyboardInput.keyActionHorizontal)) {
+//            GL33.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//        }
 
         if (!init) {
             renderInitialization();
             System.out.println("Should only be one");
             init = true;
-            generateIndiciesFromVertices(vertices, 8);
+            generateIndiciesFromVertices(oldVertices, 3);
         }
         inRenderLoop();
     }

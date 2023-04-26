@@ -1,6 +1,6 @@
 package dev.vcsocial.lazerwizard.entity;
 
-import dev.vcsocial.lazerwizard.component.KeyboardInputComponent;
+import dev.vcsocial.lazerwizard.component.input.KeyboardInputComponent;
 
 public class Keyboard extends AbstractEntity{
     private final KeyboardInputComponent keyboardInputComponent;

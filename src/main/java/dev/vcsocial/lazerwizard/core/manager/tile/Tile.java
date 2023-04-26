@@ -1,6 +1,6 @@
-package dev.vcsocial.lazerwizard.world;
+package dev.vcsocial.lazerwizard.core.manager.tile;
 
-import dev.vcsocial.lazerwizard.common.GlColor;
+import dev.vcsocial.lazerwizard.component.GlColor;
 import dev.vcsocial.lazerwizard.component.TileType;
 
 public class Tile {

@@ -1,7 +1,7 @@
 package dev.vcsocial.lazerwizard.old;
 
 import dev.vcsocial.lazerwizard.common.GlColor;
-import dev.vcsocial.lazerwizard.world.LevelMap;
+import dev.vcsocial.lazerwizard.core.manager.tile.TileMapManager;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
 import org.joml.Vector2d;
@@ -35,14 +35,14 @@ public class OldPlayerLogic {
         }
     }
 
-    private final LevelMap levelMap;
+    private final TileMapManager levelMap;
 
     private Vector2d position;
     private Vector2d direction;
     private Vector2d plane;
     private boolean toggleRenderEnabled = false;
 
-    public OldPlayerLogic(int coordinateX, int coordinateY, LevelMap levelMap) {
+    public OldPlayerLogic(int coordinateX, int coordinateY, TileMapManager levelMap) {
         this.levelMap = levelMap;
         position = new Vector2d(coordinateX, coordinateY);
         direction = new Vector2d(-1, 0);

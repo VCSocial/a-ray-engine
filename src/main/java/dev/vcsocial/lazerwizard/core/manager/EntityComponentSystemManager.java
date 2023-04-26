@@ -1,8 +1,13 @@
 package dev.vcsocial.lazerwizard.core.manager;
 
 import com.badlogic.ashley.core.*;
-import dev.vcsocial.lazerwizard.component.*;
-import dev.vcsocial.lazerwizard.config.keybindings.KeyAction;
+import dev.vcsocial.lazerwizard.component.CameraComponent;
+import dev.vcsocial.lazerwizard.component.LineMeshGroup;
+import dev.vcsocial.lazerwizard.component.MovementComponent;
+import dev.vcsocial.lazerwizard.component.PositionComponent;
+import dev.vcsocial.lazerwizard.component.input.CursorInputComponent;
+import dev.vcsocial.lazerwizard.component.input.KeyboardInputComponent;
+import dev.vcsocial.lazerwizard.component.input.MouseButtonInputComponent;
 import dev.vcsocial.lazerwizard.entity.Player;
 import dev.vcsocial.lazerwizard.system.EntitySystemOrListener;
 import jakarta.inject.Singleton;
@@ -35,11 +40,13 @@ public class EntityComponentSystemManager {
         });
 
         var player = new Player.Builder()
-                .withCursorInput(new CursorInputComponent(0,0))
-                .withMouseButtonInput(new MouseButtonInputComponent(-1, -1, -1))
-                .withKeyboardInput(new KeyboardInputComponent(KeyAction.INVALID))
+                .withCamera(CameraComponent.SOUTH_FACING)
+                .withCursorInput(new CursorInputComponent())
+                .withMouseButtonInput(new MouseButtonInputComponent())
+                .withKeyboardInput(new KeyboardInputComponent())
                 .withPosition(new PositionComponent(1,1))
-                .withMovement(new MovementComponent(new Vector2f(0, 0), 1))
+                .withMovement(new MovementComponent(new Vector2f(0, 0), 0.03f))
+                .withLineMeshGroup(new LineMeshGroup())
                 .build();
 
         engine.addEntity(player);

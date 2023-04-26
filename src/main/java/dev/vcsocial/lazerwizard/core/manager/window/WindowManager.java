@@ -1,16 +1,16 @@
-package dev.vcsocial.lazerwizard.core.manager;
+package dev.vcsocial.lazerwizard.core.manager.window;
 
 import dev.vcsocial.lazerwizard.common.GlColor;
 import dev.vcsocial.lazerwizard.core.helper.lifecycle.LifeCycleEventBroker;
 import dev.vcsocial.lazerwizard.core.helper.lifecycle.PostWindowInitializationEvent;
+import dev.vcsocial.lazerwizard.core.manager.FrameManager;
+import dev.vcsocial.lazerwizard.core.manager.window.exception.GlfwInitializationException;
+import dev.vcsocial.lazerwizard.core.manager.window.exception.GlfwWindowCreationException;
 import dev.vcsocial.lazerwizard.core.util.GlOperationsUtil;
-import dev.vcsocial.lazerwizard.core.manager.exception.GlfwInitializationException;
-import dev.vcsocial.lazerwizard.core.manager.exception.GlfwWindowCreationException;
 import io.avaje.inject.PostConstruct;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -31,16 +31,14 @@ public class WindowManager implements AutoCloseable {
     private static final String DEFAULT_TITLE = "Lazer Wizard Engine";
     private static final int DEFAULT_WIDTH = 1024;
     private static final int DEFAULT_HEIGHT = 576;
-    private static final GlColor DEFAULT_BACKGROUND_COLOR = new GlColor(150, 50, 150);
+    private static final GlColor DEFAULT_BACKGROUND_COLOR = new GlColor(125, 50, 150);
 
     private final FrameManager frameManager;
     private final LifeCycleEventBroker lifeCycleEventBroker;
     private final String title;
     private int width;
     private int height;
-    public static long window; //TODO remove
-
-    private Matrix4f projecion;
+    public long window;
 
     public WindowManager(FrameManager frameManager, LifeCycleEventBroker lifeCycleEventBroker) { // List<PollingManager> inputPollerList) {
         this.frameManager = frameManager;
@@ -85,6 +83,7 @@ public class WindowManager implements AutoCloseable {
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
 
         // Create window
+//        window = GLFW.glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), MemoryUtil.NULL);
         window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if (window == MemoryUtil.NULL) {
             throw new GlfwWindowCreationException("Unable to create window through GLFW");
@@ -110,13 +109,13 @@ public class WindowManager implements AutoCloseable {
             GLFW.glfwGetWindowSize(window, pWidth, pHeight);
 
             // Get the resolution of the primary monitor
-            GLFWVidMode vidmode = GLFW.glfwGetVideoMode(glfwGetPrimaryMonitor());
+            GLFWVidMode videoMode = GLFW.glfwGetVideoMode(glfwGetPrimaryMonitor());
 
             // Center the window
             GLFW.glfwSetWindowPos(
                     window,
-                    (vidmode.width() - pWidth.get(0)) / 2,
-                    (vidmode.height() - pHeight.get(0)) / 2
+                    (videoMode.width() - pWidth.get(0)) / 2,
+                    (videoMode.height() - pHeight.get(0)) / 2
             );
         } // the stack frame is popped automatically
 
@@ -129,16 +128,12 @@ public class WindowManager implements AutoCloseable {
         LOGGER.trace("OpenGL capabilities have been created");
 
         GlOperationsUtil.glClearColor(DEFAULT_BACKGROUND_COLOR);
-        // TODO Projection here? bg color is working at this moment
+        GL33.glEnable(GL33.GL_DEPTH_TEST | GL33.GL_STENCIL_TEST);
 
-        GL33.glEnable(GL33.GL_DEPTH_TEST);
-        GL33.glEnable(GL33.GL_STENCIL_TEST);
-
-        // Set back to be culled based on counter clockwise indexing
-        // TODO confirm the backface is actually what gets culled and not the front
-//        GL33.glEnable(GL33.GL_CULL_FACE);
-//        GL33.glCullFace(GL33.GL_BACK);
-//        GL33.glFrontFace(GL33.GL_CCW);
+        // Set back to be culled based on counterclockwise indexing
+        GL33.glEnable(GL33.GL_CULL_FACE);
+        GL33.glCullFace(GL33.GL_BACK);
+        GL33.glFrontFace(GL33.GL_CCW);
 
         lifeCycleEventBroker.registerEvent(new PostWindowInitializationEvent());
     }
@@ -152,8 +147,6 @@ public class WindowManager implements AutoCloseable {
         GLFW.glfwSetWindowTitle(window,
                 title + " \t | \t [Frame Time ms=" + frameManager.getFrameTimeMs() + "]");
 
-        GLFW.glfwSwapBuffers(window);
-        GLFW.glfwPollEvents();
     }
 
     public void setWindowShouldClose() {

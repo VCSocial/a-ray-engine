@@ -1,4 +1,4 @@
-package dev.vcsocial.lazerwizard.component;
+package dev.vcsocial.lazerwizard.component.input;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;

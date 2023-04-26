@@ -17,7 +17,7 @@ public class MouseBindingsConfiguration {
                 PrimitiveTuples.pair(0, -1), CursorAction.UP,
                 PrimitiveTuples.pair(0, 1), CursorAction.DOWN,
                 PrimitiveTuples.pair(-1, 0), CursorAction.LEFT,
-                PrimitiveTuples.pair(-1, 0), CursorAction.RIGHT
+                PrimitiveTuples.pair(1, 0), CursorAction.RIGHT
         );
         cursorMappings.put(PrimitiveTuples.pair(0, 0), CursorAction.STILL);
 
@@ -88,6 +88,6 @@ public class MouseBindingsConfiguration {
     }
 
     public CursorAction getActionForCursorDelta(int deltaX, int deltaY) {
-        return cursorMappings.get(PrimitiveTuples.pair(deltaX, deltaY));
+        return cursorMappings.getOrDefault(PrimitiveTuples.pair(deltaX, deltaY), CursorAction.STILL);
     }
 }

@@ -3,7 +3,7 @@ package dev.vcsocial.lazerwizard.core.polling;
 import com.badlogic.ashley.signals.Signal;
 import dev.vcsocial.lazerwizard.core.helper.lifecycle.LifeCycleEventBroker;
 import dev.vcsocial.lazerwizard.core.helper.lifecycle.PostWindowInitializationEvent;
-import dev.vcsocial.lazerwizard.core.manager.WindowManager;
+import dev.vcsocial.lazerwizard.core.manager.window.WindowManager;
 import dev.vcsocial.lazerwizard.core.polling.signal.InputSignal;
 import dev.vcsocial.lazerwizard.core.polling.signal.KeyboardInputSignal;
 import dev.vcsocial.lazerwizard.system.InputSystem;
