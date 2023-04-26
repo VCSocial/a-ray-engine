@@ -1,4 +1,4 @@
-package dev.vcsocial.arayengine.world;
+package dev.vcsocial.arayengine.component;
 
 public enum TileType {
     WALL,

@@ -1,17 +1,18 @@
 package dev.vcsocial.arayengine.world;
 
-import dev.vcsocial.arayengine.EntryPoint;
 import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.common.Renderable;
-import dev.vcsocial.arayengine.window.Window;
+import dev.vcsocial.arayengine.component.TileType;
+import dev.vcsocial.arayengine.manager.window.WindowLifecycleManager;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MutableMap;
+import org.joml.Vector2d;
 import org.joml.Vector2i;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL33.*;
 
 public class LevelMap implements Renderable {
 
@@ -126,13 +127,12 @@ public class LevelMap implements Renderable {
 
     public void render() {
         if (toggleRenderEnabled) {
-            var playerPosition = EntryPoint.PLAYER.getPosition();
-//            var playerDirection = EntryPoint.PLAYER.getDirection();
+            var playerPosition = new Vector2d();
 
 
             // Identify middle of the screen and identify point half way offset using height and width
-            var xA = (Window.width/ Tile.getTileSize() / 2) - (width / 2);
-            var yA = (Window.height / Tile.getTileSize() / 2) - (height / 2);
+            var xA = (WindowLifecycleManager.width/ Tile.getTileSize() / 2) - (width / 2);
+            var yA = (WindowLifecycleManager.height / Tile.getTileSize() / 2) - (height / 2);
 
             // Draw each grid item
             for (int i = 0 ; i < tileMap.size(); i++) {

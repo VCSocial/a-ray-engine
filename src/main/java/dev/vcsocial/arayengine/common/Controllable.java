@@ -1,6 +1,5 @@
 package dev.vcsocial.arayengine.common;
 
-import dev.vcsocial.arayengine.EntryPoint;
 import dev.vcsocial.arayengine.diagnostics.FpsCounter;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
@@ -25,7 +24,7 @@ public interface Controllable {
             }
 
             if (key == GLFW_KEY_TAB && action == GLFW_RELEASE) {
-                EntryPoint.LEVEL_MAP.toggleRendering();
+//                EntryPoint.LEVEL_MAP.toggleRendering();
             }
 
             if (key == GLFW_KEY_F && action == GLFW_RELEASE) {
@@ -33,20 +32,23 @@ public interface Controllable {
             }
 
             if (action != GLFW_RELEASE &&  velocityRelevantKeys.contains(key)) {
-                if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-                    moveForward();
-                }
-                if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-                    moveBackward();
-                }
-                if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-                    moveLeft();
-                }
-                if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-                    moveRight();
-                }
+                boolean isW, isS, isA, isD;
+
+//                if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+//                    moveForward();
+//                }
+//                if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+//                    moveBackward();
+//                }
+//                if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+//                    moveLeft();
+//                }
+//                if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+//                    moveRight();
+//                }
             }
         });
+
     }
 
     void moveForward();

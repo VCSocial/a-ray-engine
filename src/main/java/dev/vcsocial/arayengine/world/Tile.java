@@ -1,6 +1,7 @@
 package dev.vcsocial.arayengine.world;
 
 import dev.vcsocial.arayengine.common.GlColor;
+import dev.vcsocial.arayengine.component.TileType;
 
 public class Tile {
     private static final GlColor DEFAULT_COLOR = GlColor.RED;

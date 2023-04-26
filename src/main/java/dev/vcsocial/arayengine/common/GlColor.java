@@ -3,6 +3,10 @@ package dev.vcsocial.arayengine.common;
 import java.util.Objects;
 
 public class GlColor {
+
+    private static final float OPAQUE = 1f;
+    private static final float TRANSPARENT = 1f;
+
     public static final GlColor RED = new GlColor(255, 0, 0);
     public static final GlColor GREEN = new GlColor(0, 255, 0);
     public static final GlColor BLUE = new GlColor(0, 0, 255);
@@ -14,11 +18,17 @@ public class GlColor {
     private final float r;
     private final float g;
     private final float b;
+    private final float alpha;
 
     public GlColor(int r, int g, int b) {
+        this(r, g, b, OPAQUE);
+    }
+
+    public GlColor(int r, int g, int b, float alpha) {
         this.r = r / 255.0f;
         this.g = g / 255.0f;
         this.b = b / 255.0f;
+        this.alpha = alpha;
     }
 
     public float getRed() {
@@ -33,14 +43,12 @@ public class GlColor {
         return b;
     }
 
-    public GlColor shadeBy(float shadeRatio) {
-        return new GlColor((int) (r * shadeRatio * 255) , (int) (g * shadeRatio * 255), (int) (b * shadeRatio * 255));
+    public float getAlpha() {
+        return alpha;
     }
 
-    public boolean isBlack() {
-        return getRed() == 0
-                && getGreen() == 0
-                && getBlue() == 0;
+    public GlColor shadeBy(float shadeRatio) {
+        return new GlColor((int) (r * shadeRatio * 255) , (int) (g * shadeRatio * 255), (int) (b * shadeRatio * 255));
     }
 
     @Override

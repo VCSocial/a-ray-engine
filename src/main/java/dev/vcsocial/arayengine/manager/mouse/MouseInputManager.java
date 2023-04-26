@@ -1,21 +1,39 @@
-package dev.vcsocial.arayengine.common;
+package dev.vcsocial.arayengine.manager.mouse;
 
-import dev.vcsocial.arayengine.EntryPoint;
+import jakarta.inject.Singleton;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
-public class MouseInput {
+@Singleton
+public class MouseInputManager {
 
     private final Vector2d previousPosition;
     private final Vector2d currentPosition;
     private final Vector2f displayVector;
 
-    private boolean withinWindow;
+    private static boolean withinWindow;
+    private static final Runnable placeHolder = new Runnable() {
+        @Override
+        public void run() {
+            System.out.println("triggered place holder");
+        }
+    };
+
+    private static UnifiedMap<Integer, Runnable> mouseButtonCallbacks = UnifiedMap.newWithKeysValues(
+            GLFW.GLFW_MOUSE_BUTTON_LEFT, placeHolder,
+            GLFW.GLFW_MOUSE_BUTTON_RIGHT, placeHolder
+    );
+
+    private static UnifiedMap<Integer, UnifiedMap<Integer, Runnable>> mouseActionCallbacks = UnifiedMap.newWithKeysValues(
+      GLFW.GLFW_PRESS, mouseButtonCallbacks
+    );
+
     private boolean pressedMouse1;
     private boolean pressedMouse2;
 
-    public MouseInput() {
+    public MouseInputManager() {
         previousPosition = new Vector2d(-1, -1);
         currentPosition = new Vector2d(0, 0);
         displayVector = new Vector2f();
@@ -28,24 +46,20 @@ public class MouseInput {
             System.out.println("[currentPosition.x=%s] [currentPosition.y=%s]".formatted(currentPosition.x, currentPosition.y));
         });
 
+
         GLFW.glfwSetCursorEnterCallback(window, (w, entered) -> {
             withinWindow = entered;
             System.out.println("Entered");
         });
 
         GLFW.glfwSetMouseButtonCallback(window, (w, button, action, mods) -> {
-           pressedMouse1 = GLFW.GLFW_MOUSE_BUTTON_1 == button
-                   && GLFW.GLFW_PRESS == action;
-           if (pressedMouse1) {
-               System.out.println("Pressed mouse 1");
-           }
-
-            pressedMouse2 = GLFW.GLFW_MOUSE_BUTTON_2 == button
-                    && GLFW.GLFW_PRESS == action;
-            if (pressedMouse2) {
-                System.out.println("Pressed mouse 2");
+            var buttonCallbacks = mouseActionCallbacks.get(action);
+            if (buttonCallbacks != null) {
+                var callback = mouseButtonCallbacks.get(button);
+                if (callback != null) {
+                    callback.run();
+                }
             }
-
         });
     }
 
@@ -60,9 +74,9 @@ public class MouseInput {
 
         // TODO dirty hack movement is also not smooth
         if (currentPosition.x < (previousPosition.x - 10)) {
-            EntryPoint.PLAYER.rotateLeft();
+//            EntryPoint.PLAYER.rotateLeft();
         } else if (currentPosition.x > (previousPosition.x + 10)) {
-            EntryPoint.PLAYER.rotateRight();
+//            EntryPoint.PLAYER.rotateRight();
         }
 
         previousPosition.x = currentPosition.x;
