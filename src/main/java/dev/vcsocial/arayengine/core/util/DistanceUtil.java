@@ -1,4 +1,4 @@
-package dev.vcsocial.arayengine.util;
+package dev.vcsocial.arayengine.core.util;
 
 import org.joml.Vector2f;
 

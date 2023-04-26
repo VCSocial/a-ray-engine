@@ -10,6 +10,14 @@ public class MovementComponent implements Component {
     public Vector2f direction;
     public float velocity;
 
+    public MovementComponent() {
+        this(new Vector2f(0, 0), 0);
+    }
+
+    public MovementComponent(float velocity) {
+        this(new Vector2f(0, 0), velocity);
+    }
+
     public MovementComponent(Vector2f direction, float velocity) {
         this.direction = direction;
         this.velocity = velocity;

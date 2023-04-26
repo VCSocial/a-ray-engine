@@ -26,8 +26,8 @@ public class EngineLifeCycleManager implements AutoCloseable {
 
     public void executeGameLoop() {
         while(!windowManager.shouldWindowClose()) {
-            windowManager.update();
             entityComponentSystemManager.update();
+            windowManager.update();
         }
     }
 }

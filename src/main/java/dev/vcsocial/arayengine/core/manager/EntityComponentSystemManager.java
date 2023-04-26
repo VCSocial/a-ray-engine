@@ -34,31 +34,15 @@ public class EntityComponentSystemManager {
             }
         });
 
-        var p = engine.createEntity();
-
-        var player = new Player();
-        player.add(new KeyboardInputComponent(KeyAction.INVALID));
-        player.add(new MouseButtonInputComponent(-1, -1, -1));
-        player.add(new CursorInputComponent(0,0));
-        player.add(new PositionComponent(1,1));
-        player.add(new MovementComponent(new Vector2f(0, 0), 1));
+        var player = new Player.Builder()
+                .withCursorInput(new CursorInputComponent(0,0))
+                .withMouseButtonInput(new MouseButtonInputComponent(-1, -1, -1))
+                .withKeyboardInput(new KeyboardInputComponent(KeyAction.INVALID))
+                .withPosition(new PositionComponent(1,1))
+                .withMovement(new MovementComponent(new Vector2f(0, 0), 1))
+                .build();
 
         engine.addEntity(player);
-//
-//
-//        engine.addEntity(new Player(
-//                new Camera(
-//                        new Vector2d(1, 1),
-//                        new Vector2d(-1, 0),
-//                        new Vector2d(0, 0.66)
-//                ),
-//                new CursorInputComponent(0,0),
-//                new MouseButtonInputComponent(-1, -1, -1),
-//                new KeyboardInputComponent(KeyAction.INVALID),
-//                new PositionComponent(1,1),
-//                new MovementComponent(new Vector2f(0, 0), 1),
-//                new RotationComponent()
-//        ));
     }
 
     public void update() {

@@ -1,7 +1,7 @@
-package dev.vcsocial.arayengine.util;
+package dev.vcsocial.arayengine.core.util;
 
 import dev.vcsocial.arayengine.common.GlColor;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL33;
 
 public final class GlOperationsUtil {
 
@@ -9,6 +9,6 @@ public final class GlOperationsUtil {
     }
 
     public static void glClearColor(GlColor glColor) {
-        GL11.glClearColor(glColor.getRed(), glColor.getGreen(), glColor.getBlue(), glColor.getAlpha());
+        GL33.glClearColor(glColor.getRed(), glColor.getGreen(), glColor.getBlue(), glColor.getAlpha());
     }
 }

@@ -125,9 +125,9 @@ public class InputSystem extends IteratingSystem implements Listener<InputSignal
 
         if (inputSignal instanceof KeyboardInputSignal k) {
             var binding = keyBindingsConfiguration.getActionForKey(k.glfwKey(), k.glfwAction());
-            if (binding != null) {
-                latestKeyAction = binding;
-            }
+            latestKeyAction = binding != null
+                    ? binding
+                    : KeyAction.INVALID;
         }
     }
 

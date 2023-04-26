@@ -16,7 +16,7 @@ import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
 
 @Singleton
-public class RawMouseInputPoller implements PollingManager {
+public class RawMouseInputPoller implements RawPoller {
 
     private static final Logger LOGGER = LogManager.getLogger(RawMouseInputPoller.class);
 

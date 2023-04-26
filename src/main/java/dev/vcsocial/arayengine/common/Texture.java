@@ -1,6 +1,6 @@
 package dev.vcsocial.arayengine.common;
 
-import dev.vcsocial.arayengine.util.IoUtils;
+import dev.vcsocial.arayengine.core.util.IoUtils;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL33.*;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL33.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_load_from_memory;
 import static org.lwjgl.system.MemoryStack.stackPush;
 

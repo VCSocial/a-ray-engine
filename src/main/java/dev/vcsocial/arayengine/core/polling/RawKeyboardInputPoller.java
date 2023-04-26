@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 
 @Singleton
-public class RawKeyboardInputPoller implements PollingManager {
+public class RawKeyboardInputPoller implements RawPoller {
 
     private static final Logger LOGGER = LogManager.getLogger(RawKeyboardInputPoller.class);
 

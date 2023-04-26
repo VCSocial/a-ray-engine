@@ -3,9 +3,9 @@ package dev.vcsocial.arayengine.core.manager;
 import dev.vcsocial.arayengine.common.GlColor;
 import dev.vcsocial.arayengine.core.helper.lifecycle.LifeCycleEventBroker;
 import dev.vcsocial.arayengine.core.helper.lifecycle.PostWindowInitializationEvent;
+import dev.vcsocial.arayengine.core.util.GlOperationsUtil;
 import dev.vcsocial.arayengine.manager.window.exception.GlfwInitializationException;
 import dev.vcsocial.arayengine.manager.window.exception.GlfwWindowCreationException;
-import dev.vcsocial.arayengine.util.GlOperationsUtil;
 import io.avaje.inject.PostConstruct;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
@@ -15,14 +15,13 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 @Singleton
@@ -69,14 +68,13 @@ public class WindowManager implements AutoCloseable {
         LOGGER.trace("Successfully initialized GLFW");
 
         GLFW.glfwDefaultWindowHints();
-        GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GL11.GL_FALSE);
-        GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GL11.GL_FALSE);
+        GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GL33.GL_FALSE);
+        GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GL33.GL_FALSE);
 
         // Set version
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GL11.GL_TRUE);
 
         // Create window
         window = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
@@ -125,14 +123,14 @@ public class WindowManager implements AutoCloseable {
         GlOperationsUtil.glClearColor(DEFAULT_BACKGROUND_COLOR);
         // TODO Projection here? bg color is working at this moment
 
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_STENCIL_TEST);
+        GL33.glEnable(GL33.GL_DEPTH_TEST);
+        GL33.glEnable(GL33.GL_STENCIL_TEST);
 
         // Set back to be culled based on counter clockwise indexing
         // TODO confirm the backface is actually what gets culled and not the front
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCullFace(GL11.GL_BACK);
-        GL11.glFrontFace(GL11.GL_CCW);
+//        GL33.glEnable(GL33.GL_CULL_FACE);
+//        GL33.glCullFace(GL33.GL_BACK);
+//        GL33.glFrontFace(GL33.GL_CCW);
 
         lifeCycleEventBroker.registerEvent(new PostWindowInitializationEvent());
     }
@@ -143,8 +141,6 @@ public class WindowManager implements AutoCloseable {
     }
 
     public void update() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
         GLFW.glfwSetWindowTitle(window,
                 title + " \t | \t [Frame Time ms=" + frameManager.getFrameTimeMs() + "]");
 

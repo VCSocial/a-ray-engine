@@ -1,6 +1,6 @@
 package dev.vcsocial.arayengine.manager.window;
 
-import dev.vcsocial.arayengine.core.polling.PollingManager;
+import dev.vcsocial.arayengine.core.polling.RawPoller;
 import dev.vcsocial.arayengine.diagnostics.FpsCounter;
 import dev.vcsocial.arayengine.manager.window.exception.GlfwInitializationException;
 import dev.vcsocial.arayengine.manager.window.exception.GlfwWindowCreationException;
@@ -43,19 +43,19 @@ public class WindowLifecycleManager {
 
     private ImmutableList<Consumer<Long>> windowConsumers;
     private ImmutableList<Runnable> renderRunners;
-    private List<PollingManager> pollingManagerList;
+    private List<RawPoller> rawPollerList;
 
     public WindowLifecycleManager(ImmutableList<Consumer<Long>> windowConsumers, ImmutableList<Runnable> renderRunners) {
         this(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TITLE, windowConsumers, renderRunners);
     }
 
     @Inject
-    public WindowLifecycleManager(List<PollingManager> pollingManagerList) {
+    public WindowLifecycleManager(List<RawPoller> rawPollerList) {
         WindowLifecycleManager.width = DEFAULT_WIDTH;
         WindowLifecycleManager.height = DEFAULT_HEIGHT;
         WindowLifecycleManager.title = DEFAULT_TITLE;
 
-        this.pollingManagerList = pollingManagerList;
+        this.rawPollerList = rawPollerList;
         this.windowConsumers = Lists.immutable.empty();
         this.renderRunners = Lists.immutable.empty();
     }
@@ -162,10 +162,10 @@ public class WindowLifecycleManager {
             FpsCounter.updateFrameTime();
 //            engine.update(1);
 
-            glfwSwapBuffers(window); // swap the color buffers
+//            glfwSwapBuffers(window); // swap the color buffers
             // Poll for window events. The key callback above will only be
             // invoked during this call.
-            glfwPollEvents();
+//            glfwPollEvents();
         }
     }
 

@@ -9,6 +9,10 @@ public class CursorInputComponent implements Component {
     public int deltaX;
     public int deltaY;
 
+    public CursorInputComponent() {
+        this(0, 0);
+    }
+
     public CursorInputComponent(int deltaX, int deltaY) {
         this.deltaX = deltaX;
         this.deltaY = deltaY;

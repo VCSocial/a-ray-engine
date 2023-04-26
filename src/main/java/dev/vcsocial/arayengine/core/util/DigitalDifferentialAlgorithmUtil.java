@@ -1,4 +1,4 @@
-package dev.vcsocial.arayengine.util;
+package dev.vcsocial.arayengine.core.util;
 
 public final class DigitalDifferentialAlgorithmUtil {
 

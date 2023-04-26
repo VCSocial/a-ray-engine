@@ -10,6 +10,10 @@ public class MouseButtonInputComponent implements Component {
     public int glfwMouseAction;
     public int glfwMouseModifier;
 
+    public MouseButtonInputComponent() {
+        this(-1, -1, -1);
+    }
+
     public MouseButtonInputComponent(int glfwMouseButton, int glfwMouseAction, int glfwMouseModifier) {
         this.glfwMouseButton = glfwMouseButton;
         this.glfwMouseAction = glfwMouseAction;
